@@ -1,0 +1,19 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="test1" dir="cherrytest">
+  <doc>
+    <description>
+	Just a test.   
+    </description>
+  </doc>
+
+  <header>
+    <file name="test1.h"/>
+  </header>
+
+  <init fun="follow_init()"/>
+
+  <makefile>
+    <file name="test1.c"/>
+  </makefile>
+</module>
