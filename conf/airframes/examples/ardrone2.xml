@@ -26,8 +26,6 @@
 
   <modules main_freq="512">
 
-    <load name="air_data.xml"/>
-    <load name="geo_mag.xml"/>
 <load name="test1.xml"/>
 
   </modules>
