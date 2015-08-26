@@ -3,7 +3,7 @@
 <module name="test1" dir="cherrytest">
   <doc>
     <description>
-	Just a test.   
+	Let me try to a calculation here.   
     </description>
   </doc>
 
@@ -11,7 +11,7 @@
     <file name="test1.h"/>
   </header>
 
-  <init fun="follow_init()"/>
+  <init fun="avoidance_alg()"/>
 
   <makefile>
     <file name="test1.c"/>

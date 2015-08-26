@@ -4,7 +4,6 @@
 
   <firmware name="rotorcraft">
     <target name="ap" board="ardrone2"/>
-
     <target name="nps" board="pc">
       <subsystem name="fdm" type="jsbsim"/>
     </target>
@@ -24,9 +23,10 @@
     <subsystem name="ins" type="extended"/>
   </firmware>
 
-  <modules main_freq="512">
-
+  <modules main_freq="60">
 <load name="test1.xml"/>
+
+<!--load name="formation_flight.xml"/-->
 
   </modules>
 
@@ -210,5 +210,15 @@
     <define name="CRITIC_BAT_LEVEL" value="9.6" unit="V"/>
     <define name="LOW_BAT_LEVEL" value="9.7" unit="V"/>
     <define name="MAX_BAT_LEVEL" value="12.4" unit="V"/>
+  </section>
+
+  <section name="FORMATION" prefix="FORM_">
+    <define name="CARROT" value="3." unit="s"/> <!-- carrot distance for followers -->
+    <define name="POS_PGAIN" value="0.02"/> <!-- coef on position error -->
+    <define name="SPEED_PGAIN" value="0.4"/> <!-- coef on speed error -->
+    <define name="COURSE_PGAIN" value="0.8"/> <!-- coef on course error (override course pgain for followers) -->
+    <define name="ALTITUDE_PGAIN" value="0.1"/> <!-- coef on altitude error -->
+    <define name="PROX" value="60." unit="m"/> <!-- proximity distance -->
+    <define name="MODE" value="0"/> <!-- mode 0 = global, 1 = local -->
   </section>
 </airframe>

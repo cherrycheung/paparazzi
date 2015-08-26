@@ -26,11 +26,16 @@
  */
 
 #include "cherrytest/test1.h"
+#include "state.h"
 
 
-void follow_init(void)
+void avoidance_alg(void)
 {
-	printf("This works too.");
+	printf("hey %f\n", stateCalcPositionEcef_i);
+	printf("hey %f\n", stateCalcPositionNed_i);
+	printf("hey %f\n", stateCalcPositionEnu_i);
+
 
 }
+
 

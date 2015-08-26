@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freek van Tienen
+ * Copyright (C) 2014 
  *
  * This file is part of paparazzi.
  *
@@ -26,5 +26,5 @@
 
 
 
-extern void follow_init(void);
+extern void avoidance_alg(void);
 
