@@ -152,6 +152,7 @@ static void on_DL_GET_SETTING(IvyClientPtr app __attribute__((unused)),
                               int argc __attribute__((unused)), char *argv[])
 {
   if (atoi(argv[1]) != AC_ID) {
+printf("unknown nps");
     return;
   }
   if (!autopilot.datalink_enabled) {

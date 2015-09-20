@@ -133,10 +133,15 @@ void dl_parse_msg(void)
 #if defined GPS_DATALINK
     case DL_REMOTE_GPS :
       // Check if the GPS is for this AC
-      if (DL_REMOTE_GPS_ac_id(dl_buffer) != AC_ID) { break; }
+      if (DL_REMOTE_GPS_ac_id(dl_buffer) != AC_ID) 
+	{
+       
+	printf("unknown data detected"); 
+	break; }
 
       // Parse the GPS
       parse_gps_datalink(
+
         DL_REMOTE_GPS_numsv(dl_buffer),
         DL_REMOTE_GPS_ecef_x(dl_buffer),
         DL_REMOTE_GPS_ecef_y(dl_buffer),
@@ -150,6 +155,7 @@ void dl_parse_msg(void)
         DL_REMOTE_GPS_ecef_zd(dl_buffer),
         DL_REMOTE_GPS_tow(dl_buffer),
         DL_REMOTE_GPS_course(dl_buffer));
+printf("own data detected in datalink\n");
       break;
 #endif
     default:

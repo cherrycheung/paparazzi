@@ -10,6 +10,8 @@
     <waypoint alt="240.0" name="WAIT2" x="-34.4" y="143.5"/>
   </waypoints>
   <blocks>
+
+
     <block name="init formation">
       <!-- formation_init() is already called -->
       <!-- init formation by adding knew slots in the formation -->
@@ -21,18 +23,26 @@
       <set var="leader_id" value="21"/> <!-- leader id -->
       <set var="nav_mode" value="NAV_MODE_ROLL"/> <!-- alternate navigation mode should be set in formation flight -->
     </block>
+
+
     <block name="cirle 1"> <!-- waiting circle out of formation -->
       <call fun="stop_formation()"/>
       <circle radius="nav_radius" until="FALSE" wp="WAIT1"/>
     </block>
+
+
     <block name="cirle 2"> <!-- waiting circle out of formation -->
       <call fun="stop_formation()"/>
       <circle radius="nav_radius" until="FALSE" wp="WAIT2"/>
     </block>
+
+
     <block name="formation" strip_button="formation" strip_icon="on.png"> <!-- start formation for a follower, leader has to be ready and in formation -->
       <call fun="start_formation()"/> <!-- inform other AC that formation is started -->
       <call fun="formation_flight()"/> <!-- formation control loop -->
     </block>
+
+
     <block name="land"> <!-- basic landing function out of formation -->
       <call fun="stop_formation()"/>
       <exception cond="(GROUND_ALT+10> GetPosAlt())" deroute="stop"/>
@@ -40,6 +50,8 @@
       <go alt="215" wp="AF"/>
       <go from="AF" hmode="route" vmode="glide" wp="RWAY"/>
     </block>
+
+
     <block name="stop">
       <attitude roll="0.0" throttle="0.0" until="FALSE" vmode="throttle"/>
     </block>

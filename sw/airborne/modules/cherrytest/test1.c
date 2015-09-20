@@ -22,28 +22,50 @@
 
 #include "cherrytest/test1.h"
 #include "state.h"
-
+#include "generated/airframe.h" /* to include the AC_ID */
+#include "subsystems/datalink/datalink.h"
 
 float d_oi;
 float d_vo;
 float r_vo;
 float rpz;
 float theta;
-
 double DD_oi[2][1];
 double A[2][1];
 float C;
 float azimuthangle;
+float positionx;
 
-
-void avoidance_alg(void)
+void cherrytest(unsigned char *buffer)
 {
+	printf("new AC id is %i\n",DL_REMOTE_GPS_ac_id(dl_buffer));
 
-	printf("hey %f\n", stateCalcPositionEcef_i);
-	printf("hey %f\n", stateCalcPositionNed_i);
-	printf("hey %f\n", stateCalcPositionEnu_i);
+  	struct EcefCoor_i new_pos;
+  	struct EnuCoor_i enu;
+  	new_pos.x = DL_REMOTE_GPS_ecef_x(dl_buffer);
+  	new_pos.y = DL_REMOTE_GPS_ecef_y(dl_buffer);
+  	new_pos.z = DL_REMOTE_GPS_ecef_z(dl_buffer);
 
-	d_oi = 2;
+  	enu_of_ecef_point_i(&enu, &state.ned_origin_i, &new_pos);
+  	INT32_VECT3_SCALE_2(enu, enu, INT32_POS_OF_CM_NUM, INT32_POS_OF_CM_DEN);
+
+	printf("hello %f\n",enu.x);
+	printf("hello %f\n",enu.y);
+	printf("hello %f\n",enu.z);
+} 
+
+int funfun()
+{
+	printf("Position x %f\n", stateGetPositionEnu_f()->x);
+	printf("Position y %f\n", stateGetPositionEnu_f()->y);
+	printf("Position z %f\n", stateGetPositionEnu_f()->z);
+	printf("Speed x %f\n", stateGetSpeedEnu_f()->x);
+	printf("Speed y %f\n", stateGetSpeedEnu_f()->y);
+	printf("Speed z %f\n", stateGetSpeedEnu_f()->z);
+	printf("aircraft id %i\n", AC_ID);
+
+	positionx = stateGetPositionEnu_f()->x;
+
 	d_vo = (pow(d_oi, 2) - pow(rpz, 2)) / d_oi;
 	r_vo = rpz * (sqrt  (pow(d_oi,2) - pow(rpz,2)   )   )/d_oi;
 	theta = atan(r_vo/d_vo);
@@ -51,16 +73,5 @@ void avoidance_alg(void)
 	DD_oi[1][1] = cos(azimuthangle) * d_vo;
 	DD_oi[2][1] = sin(azimuthangle) * d_vo;
 
-
-	double B(double A[], double DD_oi[], int n)	
-	{
-	double result = 0.0;
-	for (int i = 0; i < n; i++)
-		result += A[i]*DD_oi[i];
-	return result;
-	}
-
-
+	DD_oi[1][1]*A[1][1] + DD_oi[2][1]*A[2][1];
 }
-
-

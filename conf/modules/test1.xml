@@ -5,14 +5,14 @@
     <description>
 	Let me try to a calculation here.   
     </description>
+    <define name="HOME_AC_ID"               description="home"/>
+
   </doc>
 
   <header>
     <file name="test1.h"/>
   </header>
-
-  <init fun="avoidance_alg()"/>
-
+  <periodic fun="funfun()" freq="1." autorun="TRUE"/>
   <makefile>
     <file name="test1.c"/>
   </makefile>

@@ -76,6 +76,10 @@
       <go wp="p2"/>
     </block>
 
+    <!--block name="test">
+      <call fun="cherrytest()"/>
+    </block-->
+
 
     <block name="route z">
       <go from="p1" hmode="route" wp="p2"/>

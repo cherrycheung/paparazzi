@@ -21,10 +21,25 @@
  */
 
 /** \file test1.h
- *  \brief Follow a certain AC id
+ *  \brief testing testing testing!
  */
 
+#include "std.h"
+#include "math/pprz_geodetic_int.h"
 
+#include "subsystems/navigation/waypoints.h"
+#include "subsystems/navigation/common_flight_plan.h"
 
-extern void avoidance_alg(void);
+#include "messages.h"
+#include "dl_protocol.h"
 
+#ifdef GPSSENDING
+#define GPSSENDING
+      if (DL_REMOTE_GPS_ac_id(dl_buffer) == LEADER_AC_ID) {
+	printf("unknown data detected");
+	cherrytest(dl_buffer);
+}
+
+#endif
+
+int funfun();
