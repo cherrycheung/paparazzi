@@ -145,7 +145,7 @@
       </message>
       <message name="RANGEFINDER" id="29">
         <field name="range" type="uint16" unit="cm"/>
-        <field name="z_dot" type="float" unit="m/s"/>
+<!--         <field name="z_dot" type="float" unit="m/s"/> -->
         <field name="z_dot_sum_err" type="float" unit="m/s"/>
         <field name="z_dot_setpoint" type="float" unit="m/s"/>
         <field name="z_sum_err" type="float" unit="m/s"/>

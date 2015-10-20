@@ -63,6 +63,7 @@ bool_t nps_bypass_ins;
 
 void nps_autopilot_init(enum NpsRadioControlType type_rc, int num_rc_script, char *rc_dev)
 {
+
   autopilot.launch = TRUE;
   autopilot.datalink_enabled = TRUE;
 

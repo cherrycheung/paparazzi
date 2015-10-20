@@ -15,6 +15,7 @@
 #include "nps_atmosphere.h"
 #include "subsystems/ins.h"
 #include "subsystems/navigation/common_flight_plan.h"
+#include "subsystems/navigation/traffic_info.h"
 
 #if USE_GPS
 #include "subsystems/gps.h"
@@ -48,6 +49,20 @@ static void on_DL_BLOCK(IvyClientPtr app __attribute__((unused)),
                         void *user_data __attribute__((unused)),
                         int argc __attribute__((unused)), char *argv[]);
 
+static void on_ACINFO(IvyClientPtr app __attribute__((unused)),
+                        void *user_data __attribute__((unused)),
+                        int argc __attribute__((unused)), char *argv[]){
+        float c = ((atoi(argv[1])) / 10.);
+	float ux = (atoi(argv[2]))/100.;
+	float uy = (atoi(argv[3]))/100.;
+	float a = (atoi(argv[4]))/100.; 
+	float t = (atoi(argv[5]))/1000.;
+	float s = (atoi(argv[6]))/100.; 
+	float cl = (atoi(argv[7]))/100.;      
+	uint8_t id = atoi(argv[8]);
+	SetAcInfo(id,ux, uy,  c, a, s, cl, t); 
+}
+
 #ifdef RADIO_CONTROL_TYPE_DATALINK
 static void on_DL_RC_3CH(IvyClientPtr app __attribute__((unused)),
                          void *user_data __attribute__((unused)),
@@ -70,6 +85,7 @@ void nps_ivy_common_init(char *ivy_bus)
   IvyBindMsg(on_DL_SETTING, NULL, "^(\\S*) DL_SETTING (\\S*) (\\S*) (\\S*)");
   IvyBindMsg(on_DL_GET_SETTING, NULL, "^(\\S*) GET_DL_SETTING (\\S*) (\\S*)");
   IvyBindMsg(on_DL_BLOCK, NULL,   "^(\\S*) BLOCK (\\S*) (\\S*)");
+  IvyBindMsg(on_ACINFO, NULL,   "^(\\S*) ACINFO (\\S*) (\\S*) (\\S*) (\\S*) (\\S*) (\\S*) (\\S*) (\\S*)");
 
 #ifdef RADIO_CONTROL_TYPE_DATALINK
   IvyBindMsg(on_DL_RC_3CH, NULL, "^(\\S*) RC_3CH (\\S*) (\\S*) (\\S*) (\\S*)");

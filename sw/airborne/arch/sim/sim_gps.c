@@ -19,7 +19,7 @@
 
 value sim_use_gps_pos(value x, value y, value z, value c, value a, value s, value cl, value t, value m, value lat,
                       value lon)
-{
+{ 
   gps.fix = (Bool_val(m) ? 3 : 0);
   gps.course = Double_val(c) * 1e7;
   gps.hmsl = Double_val(a) * 1000.;

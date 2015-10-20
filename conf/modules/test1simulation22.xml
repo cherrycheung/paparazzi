@@ -1,0 +1,21 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="test1simulation22" dir="cherrytest">
+  <doc>
+    <description>
+	Let me try to a calculation here in simulation   
+    </description>
+    <define name="HOME_AC_ID"               description="home"/>
+
+  </doc>
+
+  <header>
+    <file name="test1simulation22.h"/>
+  </header>
+  <!--periodic fun="avoidancesim2()" freq="1." autorun="TRUE"/-->
+  <!--datalink message="ACINFO" fun="ParseACINFO()"/-->
+  <!--periodic fun="timetesting()" freq="1." autorun="TRUE"/-->
+  <makefile>
+    <file name="test1simulation22.c"/>
+  </makefile>
+</module>

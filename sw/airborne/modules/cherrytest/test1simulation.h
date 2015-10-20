@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005  Pascal Brisset, Antoine Drouin
+ * Copyright (C) 2014 
  *
  * This file is part of paparazzi.
  *
@@ -17,33 +17,21 @@
  * along with paparazzi; see the file COPYING.  If not, write to
  * the Free Software Foundation, 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- */
-
-/**
- * @file subsystems/navigation/traffic_info.c
- *
- * Information relative to the other aircrafts.
  *
  */
 
-#include <inttypes.h>
+/** \file test1simulation.h
+ *  \brief testing testing testing!
+ */
+
+#include "std.h"
+#include "math/pprz_geodetic_int.h"
+
+#include "subsystems/navigation/waypoints.h"
+#include "subsystems/navigation/common_flight_plan.h"
 #include "subsystems/navigation/traffic_info.h"
-#include "generated/airframe.h"
 
-uint8_t acs_idx;
-uint8_t the_acs_id[NB_ACS_ID];
-struct ac_info_ the_acs[NB_ACS];
+#include "messages.h"
+#include "dl_protocol.h"
+int avoidancesim();
 
-void traffic_info_init(void)
-{ 
-  the_acs_id[0] = 0;  // ground station
-  the_acs_id[AC_ID] = 1;
-  the_acs[the_acs_id[AC_ID]].ac_id = AC_ID;
-  acs_idx = 2;
-  
-}
-
-struct ac_info_ *get_ac_info(uint8_t id)
-{
-  return &the_acs[the_acs_id[id]];
-}

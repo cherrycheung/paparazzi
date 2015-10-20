@@ -35,6 +35,7 @@ bool_t gps_has_fix;
 
 void  gps_feed_value()
 {
+
   // FIXME, set proper time instead of hardcoded to May 2014
   gps.week = 1794;
   gps.tow = fdm.time * 1000;

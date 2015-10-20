@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005  Pascal Brisset, Antoine Drouin
+ * Copyright (C) 2015
  *
  * This file is part of paparazzi.
  *
@@ -17,33 +17,40 @@
  * along with paparazzi; see the file COPYING.  If not, write to
  * the Free Software Foundation, 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- */
-
-/**
- * @file subsystems/navigation/traffic_info.c
- *
- * Information relative to the other aircrafts.
  *
  */
 
 #include <inttypes.h>
 #include "subsystems/navigation/traffic_info.h"
 #include "generated/airframe.h"
+#include "state.h"
 
 uint8_t acs_idx;
 uint8_t the_acs_id[NB_ACS_ID];
 struct ac_info_ the_acs[NB_ACS];
 
-void traffic_info_init(void)
+void traffic_info_init2(void)
 { 
+
   the_acs_id[0] = 0;  // ground station
   the_acs_id[AC_ID] = 1;
   the_acs[the_acs_id[AC_ID]].ac_id = AC_ID;
   acs_idx = 2;
-  
 }
 
 struct ac_info_ *get_ac_info(uint8_t id)
 {
   return &the_acs[the_acs_id[id]];
 }
+
+void cherrytesting(){
+  printf("Position x %f\n", stateGetPositionEnu_f()->x);
+  printf("Position y %f\n", stateGetPositionEnu_f()->y);
+  printf("Speed x %f\n", stateGetSpeedEnu_f()->x);
+  printf("Speed y %f\n", stateGetSpeedEnu_f()->y);
+  
+  struct ac_info_ * leader = get_ac_info(201);
+  float ownspeed = ac->gspeed
+}
+
+

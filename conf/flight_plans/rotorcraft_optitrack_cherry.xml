@@ -9,10 +9,10 @@
     <waypoint name="CLIMB" x="0.0" y="0.0"/>
     <waypoint name="STDBY" x="0.0" y="0.0"/>
     <waypoint name="TD" x="0.0" y="0.0"/>
-    <waypoint lat="51.990610" lon="4.376788" name="p1"/>
-    <waypoint lat="51.990626" lon="4.376832" name="p2"/>
-    <waypoint lat="51.990643" lon="4.376758" name="p3"/>
-    <waypoint lat="51.990657" lon="4.376802" name="p4"/>
+    <waypoint lat="51.9906132" lon="4.3767885" name="p1"/>
+    <waypoint lat="51.9906330" lon="4.3768256" name="p2"/>
+    <waypoint lat="51.9906338" lon="4.3767534" name="p3"/>
+    <waypoint lat="51.9906565" lon="4.3767893" name="p4"/>
     <waypoint lat="51.990646" lon="4.376724" name="FA1"/>
     <waypoint lat="51.990677" lon="4.376812" name="FA2"/>
     <waypoint lat="51.990624" lon="4.376867" name="FA3"/>
@@ -41,6 +41,7 @@
       <call fun="NavKillThrottle()"/>
       <while cond="!GpsFixValid()"/>
     </block>
+
     <block name="Geo init">
       <while cond="LessThan(NavBlockTime(), 10)"/>
       <call fun="NavSetWaypointHere(WP_HOME)"/>
@@ -49,19 +50,23 @@
       <call fun="NavSetWaypointHere(WP_TD)"/>
       <call fun="NavSetAltitudeReferenceHere()"/>
     </block>
+
     <block name="Holding point">
       <call fun="NavKillThrottle()"/>
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
+
     <block name="Start Engine">
       <call fun="NavResurrect()"/>
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
+
     <block name="Takeoff" strip_button="Takeoff" strip_icon="takeoff.png">
       <exception cond="stateGetPositionEnu_f()->z > 2.0" deroute="Standby"/>
       <call fun="NavSetWaypointHere(WP_CLIMB)"/>
-      <stay climb="0.5" vmode="climb" wp="CLIMB"/>
+      <stay climb="0.5" vmode="climb" wp="CLIMB"/>	
     </block>
+
     <block name="Standby" strip_button="Standby" strip_icon="home.png">
       <stay wp="STDBY"/>
     </block>
@@ -70,22 +75,22 @@
     <block name="stay_p1">
       <stay wp="p1"/>
     </block>
+    <block name="stay_p2">
+      <stay wp="p2"/>
+    </block>
+    <block name="stay_p3">
+      <stay wp="p3"/>
+    </block>
+    <block name="stay_p4">
+      <call fun = "avoidancesim()"/>
+      <go wp="p4"/>
 
-    <block name="go_p2">
-      <call fun="nav_set_heading_deg(90)"/>
-      <go wp="p2"/>
     </block>
 
-    <!--block name="test">
-      <call fun="cherrytest()"/>
-    </block-->
 
 
-    <block name="route z">
-      <go from="p1" hmode="route" wp="p2"/>
-      <go from="p2" hmode="route" wp="p3"/>
-      <go from="p3" hmode="route" wp="p4"/>
-      <deroute block="stay_p1"/>
+    <block name="test">
+      <call fun = "avoidancesim()"/>
     </block>
 
     <block name="land here" strip_button="Land Here" strip_icon="land-right.png">
