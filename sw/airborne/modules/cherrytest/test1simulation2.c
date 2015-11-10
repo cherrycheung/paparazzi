@@ -20,37 +20,91 @@
  *
  */
 
-#include <inttypes.h>
-#include "subsystems/navigation/traffic_info.h"
-#include "generated/airframe.h"
+#include <stdio.h>
+#include <time.h>
+#include "cherrytest/test1simulation.h"
 #include "state.h"
+#include "generated/airframe.h" /* to include the AC_ID */
+#include "subsystems/datalink/datalink.h"
+#include "math.h"
+#include "subsystems/navigation/traffic_info.h"
+#include "subsystems/gps.h"
+#include "messages.h"
+#include "subsystems/datalink/downlink.h"
+#include "navigation.h"
 
-uint8_t acs_idx;
-uint8_t the_acs_id[NB_ACS_ID];
-struct ac_info_ the_acs[NB_ACS];
-
-void traffic_info_init2(void)
-{ 
-
-  the_acs_id[0] = 0;  // ground station
-  the_acs_id[AC_ID] = 1;
-  the_acs[the_acs_id[AC_ID]].ac_id = AC_ID;
-  acs_idx = 2;
-}
-
-struct ac_info_ *get_ac_info(uint8_t id)
+int avoid_detection2()
 {
-  return &the_acs[the_acs_id[id]];
-}
-
-void cherrytesting(){
-  printf("Position x %f\n", stateGetPositionEnu_f()->x);
-  printf("Position y %f\n", stateGetPositionEnu_f()->y);
-  printf("Speed x %f\n", stateGetSpeedEnu_f()->x);
-  printf("Speed y %f\n", stateGetSpeedEnu_f()->y);
+  /* To construct the package of incoming data */
+  int ac_id2 = 201;
+  struct ac_info_ * intr = get_ac_info(ac_id2);
+  struct ac_info_ intruder;
   
-  struct ac_info_ * leader = get_ac_info(201);
-  float ownspeed = ac->gspeed
+  intruder.ac_id = intr->ac_id;
+  intruder.course = intr->course;
+  intruder.east = intr->east - 594534.8125;
+  intruder.north = intr->north - 5760891.5000;      
+  intruder.alt = intr->alt;
+  intruder.itow = intr->itow;    
+  intruder.gspeed = intr->gspeed;
+  intruder.climb = intr->climb;
+  
+  float ownship_dronex = stateGetPositionEnu_f()->x;
+  float ownship_droney = stateGetPositionEnu_f()->y;
+  printf("ardrone 2\n");  
+  printf("207: Pos x %f\n", ownship_dronex);
+  printf("207: Pos y %f\n", ownship_droney);
+  printf("aircraft intruder id is %d\n",intruder.ac_id);
+  printf("201: Pos x %f\n",intruder.east);
+  printf("201: Pos y %f\n",intruder.north);  
+  printf("201: C %f\n",intruder.course);
+  printf("201: V %f\n",intruder.gspeed); 
+
+  /* Avoidance detection */
+  float d_oi = sqrt((ownship_dronex - intruder.east)*(ownship_dronex - intruder.east) + (ownship_droney - intruder.north)*(ownship_droney - intruder.north));
+  printf("distance between the two %f\n",d_oi);
+    
+  float rpz = 0.5; 
+  float d_avo = 0.75; 
+  
+  if (d_oi > rpz){
+    float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
+    float r_vo = rpz * (sqrt(d_oi*d_oi - rpz*rpz))/d_oi;
+    float theta_vo = atan(r_vo/d_vo);
+    float azimuth;
+    
+    if(intruder.east - ownship_dronex != 0){
+      float azimuth = atan(abs(intruder.north - ownship_droney)/abs(intruder.east - ownship_dronex));
+    }
+    else{
+      float azimuth = 0;
+    }
+  
+    float DD_oi[2];
+    DD_oi[0] = d_vo * cos(azimuth);
+    DD_oi[1] = d_vo * sin(azimuth);
+
+    float BBB = (0 + 1) * DD_oi[0] + (1 - 0) * DD_oi[1];
+    float CCC = 1*d_vo;
+    float avoid_angle = acos(BBB/(CCC*d_vo));
+    
+    if (avoid_angle < theta_vo && BBB > 0){
+      if (d_oi < d_avo){
+	printf("colliding");
+	return(1);
+      }
+      else{
+	printf("not colliding yet");
+      }
+    }
+    else{
+      printf("safe");
+    }
+  }
+  else{ printf("too close");} 
+
+  printf(" \n");
+  printf(" \n");
+  printf(" \n");
+  return 0;
 }
-
-

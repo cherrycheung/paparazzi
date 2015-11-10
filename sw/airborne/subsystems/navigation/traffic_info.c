@@ -40,7 +40,6 @@ void traffic_info_init(void)
   the_acs_id[AC_ID] = 1;
   the_acs[the_acs_id[AC_ID]].ac_id = AC_ID;
   acs_idx = 2;
-  
 }
 
 struct ac_info_ *get_ac_info(uint8_t id)

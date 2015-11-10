@@ -52,7 +52,7 @@ static void on_DL_BLOCK(IvyClientPtr app __attribute__((unused)),
 static void on_ACINFO(IvyClientPtr app __attribute__((unused)),
                         void *user_data __attribute__((unused)),
                         int argc __attribute__((unused)), char *argv[]){
-        float c = ((atoi(argv[1])) / 10.);
+        float c = RadOfDeg((atoi(argv[1])) / 10.);
 	float ux = (atoi(argv[2]))/100.;
 	float uy = (atoi(argv[3]))/100.;
 	float a = (atoi(argv[4]))/100.; 

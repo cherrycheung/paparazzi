@@ -1,0 +1,16 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="avoidcalculations" dir="cherrytest">
+  <doc>
+    <description>
+	Let me try to a calculation here in simulation   
+    </description>
+  </doc>
+
+  <header>
+    <file name="avoidcalculations.h"/>
+  </header>
+  <makefile>
+    <file name="avoidcalculations.c"/>
+  </makefile>
+</module>

@@ -30,8 +30,10 @@
 #include "subsystems/navigation/waypoints.h"
 #include "subsystems/navigation/common_flight_plan.h"
 #include "subsystems/navigation/traffic_info.h"
-
+#include "avoidcalculations.h"
 #include "messages.h"
 #include "dl_protocol.h"
-int avoidancesim();
-
+int avoid_detection1();
+int headingset();
+float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
+float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);

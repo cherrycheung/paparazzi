@@ -20,18 +20,10 @@
  *
  */
 
-/** \file test1simulation2.h
- *  \brief testing testing testing!
+/** \file avoidcalculations.h
+ *  \brief Header file of avoidance calculations
  */
 
-#include "std.h"
-#include "math/pprz_geodetic_int.h"
 
-#include "subsystems/navigation/waypoints.h"
-#include "subsystems/navigation/common_flight_plan.h"
-#include "subsystems/navigation/traffic_info.h"
-
-#include "messages.h"
-#include "dl_protocol.h"
-int avoid_detection2();
-
+float calcGlobalAngle(float ownshipx, float ownshipy, float intruderx, float intrudery);
+int calctest;
