@@ -70,7 +70,7 @@ int avoid_detection1()
   float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,angle_ownship_deg);  
   float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,angle_ownship_deg);  
   /* PRINTING */ 
-  printf("ardrone 1, d_oi: %f  ",d_oi);
+  printf("ardrone 1, d_oi: %f  ", d_oi);
   /*printf("201: Pos x & y %f, %f\n", own_pos_x, own_pos_y); 
   printf("%d: Pos x & y %f, %f\n",intruder.ac_id,int_pos_x,int_pos_y);
   
