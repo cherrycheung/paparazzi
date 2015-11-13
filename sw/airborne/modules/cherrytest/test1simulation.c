@@ -38,8 +38,6 @@ int valueofdetection = 0;
 
 bool_t avoid_detection1(void)
 {
-  ;
-  
   /* To construct the package of incoming data */
   int ac_id2 = 207;
   struct ac_info_ * intr = get_ac_info(ac_id2);
@@ -70,18 +68,15 @@ bool_t avoid_detection1(void)
   float angle_ownship_rad = stateGetNedToBodyEulers_f()->psi;
   float angle_ownship_deg = (angle_ownship_rad/M_PI)*180;
   float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,angle_ownship_deg);  
-  float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,angle_ownship_deg);  
+  float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,angle_ownship_deg);
+  
   /* PRINTING */ 
   printf("ardrone 1, d_oi: %f  ", d_oi);
-  /*printf("201: Pos x & y %f, %f\n", own_pos_x, own_pos_y); 
-  printf("%d: Pos x & y %f, %f\n",intruder.ac_id,int_pos_x,int_pos_y);
-  printf("ownspeed x and y: %f & %f  ", own_speed_x, own_speed_y); 
-  printf("intruder speed x and y: %f & %f  ", int_speed_x, int_speed_y);*/ 
   printf("ownship angle: %f %f %f  ",angle_ownship_deg,angle_global,angle_azimuth);
  
   
   if (d_oi > rpz){
-    if (angle_ownship_deg > (angle_global - 45) &&  angle_ownship_deg < (angle_global + 45)){
+    if (angle_ownship_deg > (angle_global - 60) &&  angle_ownship_deg < (angle_global + 60)){
       float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
       float r_vo = rpz * (sqrt(d_oi*d_oi - rpz*rpz))/d_oi;
       float alpha_vo = atan(r_vo/d_vo);
@@ -91,7 +86,6 @@ bool_t avoid_detection1(void)
       float DD_oi[2];
       DD_oi[0] = d_vo * cos(angle_azimuth) * cos(theta_vo);
       DD_oi[1] = d_vo * sin(angle_azimuth) * cos(theta_vo);
-
     
       float BB = (own_speed_x - int_speed_x) * DD_oi[0] + (own_speed_y - int_speed_y) * DD_oi[1];
       float CC = sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo;
@@ -121,22 +115,11 @@ bool_t avoid_detection1(void)
   return TRUE;
 }
 
-int avoid_navigation1(){
-    printf("colliding works\n");
-return 0;
-}
-
 int safe_warning(){
     valueofdetection = 0;
 return 0;
 }
-/*
-int headingset(){
-  
-  nav_set_heading_deg(yawangle);
-  return 0;
-}
-*/
+
 float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship){
   float global_angle1;
   float azimuth_angle;
