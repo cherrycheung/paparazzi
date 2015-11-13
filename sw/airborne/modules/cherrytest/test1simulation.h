@@ -33,7 +33,24 @@
 #include "avoidcalculations.h"
 #include "messages.h"
 #include "dl_protocol.h"
-int avoid_detection1();
+
+#include <stdio.h>
+#include <time.h>
+#include "state.h"
+#include "generated/airframe.h" /* to include the AC_ID */
+#include "subsystems/datalink/datalink.h"
+#include "math.h"
+#include "subsystems/navigation/traffic_info.h"
+#include "subsystems/gps.h"
+#include "messages.h"
+#include "subsystems/datalink/downlink.h"
+#include "navigation.h"
+
+extern bool_t avoid_detection1(void);
+int avoid_navigation1();
 int headingset();
 float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
 float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
+
+extern int valueofdetection;
+extern int safe_warning();

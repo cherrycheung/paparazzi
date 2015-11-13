@@ -186,6 +186,7 @@
     <define name="PGAIN" value="79"/>
     <define name="DGAIN" value="100"/>
     <define name="IGAIN" value="30"/>
+ <define name="REF_MAX_SPEED" value="0.25"/>
   </section>
 
   <section name="SIMULATOR" prefix="NPS_">
@@ -209,13 +210,5 @@
     <define name="MAX_BAT_LEVEL" value="12.4" unit="V"/>
   </section>
 
-  <section name="FORMATION" prefix="FORM_">
-    <define name="CARROT" value="3." unit="s"/> <!-- carrot distance for followers -->
-    <define name="POS_PGAIN" value="0.02"/> <!-- coef on position error -->
-    <define name="SPEED_PGAIN" value="0.4"/> <!-- coef on speed error -->
-    <define name="COURSE_PGAIN" value="0.8"/> <!-- coef on course error (override course pgain for followers) -->
-    <define name="ALTITUDE_PGAIN" value="0.1"/> <!-- coef on altitude error -->
-    <define name="PROX" value="60." unit="m"/> <!-- proximity distance -->
-    <define name="MODE" value="0"/> <!-- mode 0 = global, 1 = local -->
-  </section>
+
 </airframe>

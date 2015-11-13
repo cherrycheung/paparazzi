@@ -34,9 +34,11 @@
 #include "navigation.h"
 #include "avoidcalculations.h"
 
-int avoid_detection1()
+int valueofdetection = 0;
+
+bool_t avoid_detection1(void)
 {
-  
+  ;
   
   /* To construct the package of incoming data */
   int ac_id2 = 207;
@@ -62,8 +64,8 @@ int avoid_detection1()
   float int_speed_x = cos(intruder.course)*intruder.gspeed;
   float int_speed_y = sin(intruder.course)*intruder.gspeed;
 
-  float rpz = 0.50; 
-  float d_avo = 1.00; 
+  float rpz = 0.8; 
+  float d_avo = 1.5; 
   float d_oi = sqrt((own_pos_x - int_pos_x)*(own_pos_x - int_pos_x) + (own_pos_y - int_pos_y)*(own_pos_y - int_pos_y));
   float angle_ownship_rad = stateGetNedToBodyEulers_f()->psi;
   float angle_ownship_deg = (angle_ownship_rad/M_PI)*180;
@@ -73,13 +75,9 @@ int avoid_detection1()
   printf("ardrone 1, d_oi: %f  ", d_oi);
   /*printf("201: Pos x & y %f, %f\n", own_pos_x, own_pos_y); 
   printf("%d: Pos x & y %f, %f\n",intruder.ac_id,int_pos_x,int_pos_y);
-  
-  
-  
-   
   printf("ownspeed x and y: %f & %f  ", own_speed_x, own_speed_y); 
   printf("intruder speed x and y: %f & %f  ", int_speed_x, int_speed_y);*/ 
-  printf("ownship angle: %f %f ",angle_ownship_deg,angle_global);
+  printf("ownship angle: %f %f %f  ",angle_ownship_deg,angle_global,angle_azimuth);
  
   
   if (d_oi > rpz){
@@ -102,6 +100,8 @@ int avoid_detection1()
       if (avoid_angle < alpha_vo && BB > 0){
 	if (d_oi < d_avo){
 	  printf("colliding\n");
+	  valueofdetection = 1;
+	  return FALSE;
 	}
 	else{
 	  printf("not colliding yet\n");
@@ -109,9 +109,7 @@ int avoid_detection1()
       }
       else{
       printf("speed angle inside but safe\n");
-	
       }
-      
     }
     else{
       printf("speed angle too large so safe\n");
@@ -120,66 +118,59 @@ int avoid_detection1()
   else{ 
     printf("inside protected zone\n");
   }
-  return 0;
+  return TRUE;
 }
 
 int avoid_navigation1(){
-  int intint = avoid_detection1;
-  if(intint = 1){
     printf("colliding works\n");
-  }
-  return 0;
+return 0;
 }
 
-int headingset(int yawangle){
+int safe_warning(){
+    valueofdetection = 0;
+return 0;
+}
+/*
+int headingset(){
+  
   nav_set_heading_deg(yawangle);
   return 0;
 }
-
+*/
 float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship){
   float global_angle1;
   float azimuth_angle;
   if(intrudery > ownshipy){
     if(intruderx == ownshipx){
       global_angle1 = 0;
-      azimuth_angle = angleownship;
-
     }
       else if(intruderx > ownshipx){
 	global_angle1 = (atan(((intruderx - ownshipx))/((intrudery - ownshipy))))/M_PI * 180;
-	azimuth_angle = abs(global_angle1 - angleownship);
       }
       else if(intruderx < ownshipx){
 	global_angle1 =  atan(((intruderx - ownshipx))/((intrudery - ownshipy)))/M_PI * 180;
-	azimuth_angle = abs(global_angle1 - angleownship);
       }
     }
     else if(intrudery < ownshipy){
       if(intruderx == ownshipx){
 	global_angle1 = 180;
-	azimuth_angle = (global_angle1 - abs(angleownship));
       }
       else if(intruderx > ownshipx){
 	global_angle1 = 180-(-1)*(atan((intruderx - ownshipx)/((intrudery - ownshipy))))/M_PI * 180;
-	azimuth_angle = abs(global_angle1 - angleownship);
       }
       else if(intruderx < ownshipx){
 	global_angle1 =  -1 * (180 - (atan(((intruderx - ownshipx))/((intrudery - ownshipy)))/M_PI * 180));
-	azimuth_angle = abs(global_angle1 - angleownship);
       }
     }
     else if(intrudery == ownshipy){
       if(intruderx > ownshipx){
 	global_angle1 = 90;
-        azimuth_angle = abs(global_angle1 - angleownship);
       }
       else if (intruderx < ownshipx){
 	global_angle1 = -90;
-	azimuth_angle = abs(global_angle1 - angleownship);
       }
       else if (intruderx == ownshipx){
 	global_angle1 = 0;
-        azimuth_angle = 0;
       }
     }
     return(global_angle1);

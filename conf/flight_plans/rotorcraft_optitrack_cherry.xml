@@ -3,6 +3,7 @@
 <flight_plan alt="1.5" ground_alt="0" lat0="51.9906322" lon0="4.3767944" max_dist_from_home="15" name="Rotorcraft Basic (Enac)" security_height="0.5">
   <header>
 #include "autopilot.h"
+
 </header>
   <waypoints>
     <waypoint name="HOME" x="0.0" y="0.0"/>
@@ -66,9 +67,131 @@
     </block>
     <block name="Standby" strip_button="Standby" strip_icon="home.png">
       <stay wp="STDBY"/>
-      <deroute block="stay_p1"/>
     </block>
-    <block name="stay_p1">
+    <block name="prepre1">
+      <call fun="nav_set_heading_deg(30)"/>
+      <stay wp="STDBY" until="stage_time>2"/>
+      <deroute block="prepre2"/>
+    </block>
+    <block name="prepre2">
+      <call fun="nav_set_heading_deg(60)"/>
+      <stay wp="STDBY" until="stage_time>2"/>
+      <deroute block="prepre3"/>
+    </block>
+    <block name="prepre3">
+      <call fun="nav_set_heading_deg(90)"/>
+      <stay wp="STDBY" until="stage_time>2"/>
+      <deroute block="prepre4"/>
+    </block>
+    <block name="prepre4">
+      <call fun="nav_set_heading_deg(120)"/>
+      <stay wp="STDBY" until="stage_time>2"/>
+      <deroute block="prepre5"/>
+    </block>
+    <block name="prepre5">
+      <call fun="nav_set_heading_deg(150)"/>
+      <stay wp="STDBY" until="stage_time>2"/>
+      <deroute block="prepre6"/>
+    </block>
+    <block name="prepre6">
+      <call fun="nav_set_heading_deg(180)"/>
+      <stay wp="STDBY" until="stage_time>2"/>
+      <deroute block="prepre7"/>
+    </block>
+    <block name="prepre7">
+      <stay wp="p1" until="stage_time>5"/>
+      <deroute block="prepre8"/>
+    </block>
+    <block name="prepre8">
+      <call fun="nav_set_heading_deg(-100)"/>
+      <stay wp="p1" until="stage_time>2"/>
+      <deroute block="1 to 2"/>
+    </block>
+    <block name="1 to 2" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
+      <stay wp="p2" until="stage_time>10"/>
+      <exception cond="valueofdetection == 1" deroute="avoid 1 to 2"/>
+      <deroute block="2 to 3"/>
+    </block>
+    <block name="2 to 3" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p3)"/>
+      <stay wp="p3" until="stage_time>10"/>
+      <exception cond="valueofdetection == 1" deroute="avoid 2 to 3"/>
+      <deroute block="3 to 4"/>
+    </block>
+    <block name="3 to 4" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p4)"/>
+      <stay wp="p4" until="stage_time>10"/>
+      <exception cond="valueofdetection == 1" deroute="avoid 3 to 4"/>
+      <deroute block="4 to 5"/>
+    </block>
+    <block name="4 to 5" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p5)"/>
+      <stay wp="p5" until="stage_time>10"/>
+      <exception cond="valueofdetection == 1" deroute="avoid 4 to 5"/>
+      <deroute block="5 to 6"/>
+    </block>
+    <block name="5 to 6" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p6)"/>
+      <stay wp="p6" until="stage_time>15"/>
+      <exception cond="valueofdetection == 1" deroute="avoid 5 to 6"/>
+      <deroute block="6 to 1"/>
+    </block>
+    <block name="6 to 1" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
+      <stay wp="p6" until="stage_time>10"/>
+      <exception cond="valueofdetection == 1" deroute="avoid 6 to 1"/>
+      <deroute block="prepre7"/>
+    </block>
+<!-- NAVIGATION BLOCKS-->
+    <block name="avoid 1 to 2">
+      <circle wp="HOME" radius="-0.8" until="stage_time>7"/>
+      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
+      <call fun="safe_warning()"/>
+      <stay wp="p2" until="stage_time>10"/>
+      <deroute block="2 to 3"/>
+    </block>
+    <block name="avoid 2 to 3">
+      <circle wp="HOME" radius="-0.8" until="stage_time>7"/>
+      <call fun="nav_set_heading_towards_waypoint(WP_p3)"/>
+      <call fun="safe_warning()"/>
+      <stay wp="p3" until="stage_time>15"/>
+      <deroute block="3 to 4"/>
+    </block>
+    <block name="avoid 3 to 4">
+      <circle wp="HOME" radius="-0.8" until="stage_time>7"/>
+      <call fun="nav_set_heading_towards_waypoint(WP_p4)"/>
+      <call fun="safe_warning()"/>
+      <stay wp="p4" until="stage_time>10"/>
+      <deroute block="4 to 5"/>
+    </block>
+    <block name="avoid 4 to 5">
+      <circle wp="HOME" radius="-0.8" until="stage_time>7"/>
+      <call fun="nav_set_heading_towards_waypoint(WP_p5)"/>
+      <call fun="safe_warning()"/>
+      <stay wp="p5" until="stage_time>10"/>
+      <deroute block="5 to 6"/>
+    </block>
+    <block name="avoid 5 to 6">
+      <circle wp="HOME" radius="-0.8" until="stage_time>7"/>
+      <call fun="nav_set_heading_towards_waypoint(WP_p6)"/>
+      <call fun="safe_warning()"/>
+      <stay wp="p6" until="stage_time>10"/>
+      <deroute block="6 to 1"/>
+    </block>
+    <block name="avoid 6 to 1">
+      <circle wp="HOME" radius="-0.8" until="stage_time>7"/>
+      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
+      <call fun="safe_warning()"/>
+      <stay wp="p1" until="stage_time>10"/>
+      <deroute block="1 to 2"/>
+    </block>
+
+    <block name="test">
+      <call fun="avoid_navigation1()"/>
+    </block>
+
+    <!--block name="stay_p1">
       <stay until="stage_time>15" wp="p1"/>
       <deroute block="go from 1 to 2"/>
     </block>
@@ -106,7 +229,7 @@
       <stay until="stage_time>15" wp="p6"/>
       <call fun="nav_set_heading_towards_waypoint(WP_p1)" until="stage_time>18"/>
       <deroute block="stay_p1"/>
-    </block>
+    </block-->
     <block name="land here" strip_button="Land Here" strip_icon="land-right.png">
       <call fun="NavSetWaypointHere(WP_TD)"/>
     </block>
