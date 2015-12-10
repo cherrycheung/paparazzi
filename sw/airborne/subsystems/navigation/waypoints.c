@@ -131,6 +131,8 @@ void waypoint_move_enu_i(uint8_t wp_id, struct EnuCoor_i *new_pos)
   }
 }
 
+
+
 /**
  * Set only local XY coordinates of waypoint without update altitude.
  * @todo: how to handle global waypoints?
@@ -146,6 +148,28 @@ void waypoint_set_xy_i(uint8_t wp_id, int32_t x, int32_t y)
     waypoint_globalize(wp_id);
   }
 }
+
+void waypoint_set_cherry(uint8_t wp_id)
+{
+  if (wp_id >= nb_waypoint) {
+    return;
+  }
+  if (waypoint_is_global(wp_id)) {
+printf("first");
+    waypoint_set_latlon(wp_id, stateGetPositionLla_i());
+  } else {
+printf("second");
+    waypoints[wp_id].enu_i.x = stateGetPositionEnu_i()->x;
+    waypoints[wp_id].enu_i.y = stateGetPositionEnu_i()->y;
+printf("%d %d\n", waypoints[wp_id].enu_i.x, waypoints[wp_id].enu_i.y);
+    /* also update ENU float representation */
+    waypoints[wp_id].enu_f.x = POS_FLOAT_OF_BFP(stateGetPositionEnu_i()->x);
+    waypoints[wp_id].enu_f.y = POS_FLOAT_OF_BFP(stateGetPositionEnu_i()->y);
+
+    waypoint_globalize(wp_id);
+  }
+}
+
 
 void waypoint_set_alt_i(uint8_t wp_id, int32_t alt)
 {

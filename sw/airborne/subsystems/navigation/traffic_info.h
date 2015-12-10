@@ -36,7 +36,7 @@ struct ac_info_ {
   uint8_t ac_id;
   float east; /* m relative to nav_utm_east0 */
   float north; /* m relative to nav_utm_north0 */
-  float course; /* rad (CW) */
+  float course; /* deg (CW) */
   float alt; /* m */
   float gspeed; /* m/s */
   float climb; /* m/s */
@@ -69,7 +69,7 @@ extern struct ac_info_ the_acs[NB_ACS];
 // the part here above only works for experiments in the Cyber Zoo
 // if in simulation, the module is included in sw/simulator/nps/nps_ivy_common.c
 
-#define SetAcInfo(_id, _utm_x /*m*/, _utm_y /*m*/, _course/*rad(CW)*/, _alt/*m*/,_gspeed/*m/s*/,_climb, _itow) { \
+#define SetAcInfo(_id, _utm_x /*m*/, _utm_y /*m*/, _course/*deg(CW)*/, _alt/*m*/,_gspeed/*m/s*/,_climb, _itow) { \
 if (id != AC_ID) {  \
     if (acs_idx < NB_ACS) {                                             	\
       if (_id > 0 && the_acs_id[_id] == 0) {                            	\

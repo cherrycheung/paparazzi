@@ -45,18 +45,22 @@
     <define name="TRIM_ROLL" value="0"/>
     <define name="TRIM_PITCH" value="0"/>
     <define name="TRIM_YAW" value="0"/>
-
+    <define name="NB_MOTOR" value="4"/>
+    <define name="SCALE" value="255"/>
 
     <!-- Time cross layout (X), with order NW (CW), NE (CCW), SE (CW), SW (CCW) -->
- <define name="TYPE" value="QUAD_X"/>
+    <define name="ROLL_COEF"   value="{ 256, -256, -256,  256}"/>
+    <define name="PITCH_COEF"  value="{ 256,  256, -256, -256}"/>
+    <define name="YAW_COEF"    value="{-256,  256, -256,  256}"/>
+    <define name="THRUST_COEF" value="{ 256,  256,  256,  256}"/>
   </section>
 
   <command_laws>
     <call fun="motor_mixing_run(autopilot_motors_on,FALSE,values)"/>
-    <set servo="TOP_LEFT" value="motor_mixing.commands[MOTOR_FRONT_LEFT]"/>
-    <set servo="TOP_RIGHT" value="motor_mixing.commands[MOTOR_FRONT_RIGHT]"/>
-    <set servo="BOTTOM_RIGHT" value="motor_mixing.commands[MOTOR_BACK_RIGHT]"/>
-    <set servo="BOTTOM_LEFT" value="motor_mixing.commands[MOTOR_BACK_LEFT]"/>
+    <set servo="TOP_LEFT" value="motor_mixing.commands[0]"/>
+    <set servo="TOP_RIGHT" value="motor_mixing.commands[1]"/>
+    <set servo="BOTTOM_RIGHT" value="motor_mixing.commands[2]"/>
+    <set servo="BOTTOM_LEFT" value="motor_mixing.commands[3]"/>
   </command_laws>
 
   <section name="IMU" prefix="IMU_">
@@ -106,6 +110,7 @@
     <define name="DEADBAND_P" value="20"/>
     <define name="DEADBAND_Q" value="20"/>
     <define name="DEADBAND_R" value="200"/>
+    <define name="REF_TAU" value="4"/>
 
     <!-- feedback -->
     <define name="GAIN_P" value="400"/>
@@ -116,7 +121,10 @@
     <define name="IGAIN_Q" value="75"/>
     <define name="IGAIN_R" value="50"/>
 
-
+    <!-- feedforward -->
+    <define name="DDGAIN_P" value="300"/>
+    <define name="DDGAIN_Q" value="300"/>
+    <define name="DDGAIN_R" value="300"/>
   </section>
 
   <section name="STABILIZATION_ATTITUDE" prefix="STABILIZATION_ATTITUDE_">
@@ -160,7 +168,7 @@
     <!-- feedforward -->
     <define name="PHI_DDGAIN" value="0"/>
     <define name="THETA_DDGAIN" value="0"/>
-    <define name="PSI_DDGAIN" value="100"/>
+    <define name="PSI_DDGAIN" value="52"/>
   </section>
 
   <section name="GUIDANCE_V" prefix="GUIDANCE_V_">
@@ -179,13 +187,13 @@
     <define name="PGAIN" value="79"/>
     <define name="DGAIN" value="100"/>
     <define name="IGAIN" value="30"/>
-    <define name="REF_MAX_SPEED" value="0.3"/>
+ <define name="REF_MAX_SPEED" value="0.3"/>
   </section>
 
   <section name="SIMULATOR" prefix="NPS_">
-<define name="ACTUATOR_NAMES" value="nw_motor, ne_motor, se_motor, sw_motor" type="string[]"/>
-    <define name="JSBSIM_MODEL" value="simple_ardrone2" type="string"/>
-    <define name="SENSORS_PARAMS" value="nps_sensors_params_ardrone2.h" type="string"/>
+    <define name="ACTUATOR_NAMES" value="{&quot;nw_motor&quot;, &quot;ne_motor&quot;, &quot;se_motor&quot;, &quot;sw_motor&quot;}"/>
+    <define name="JSBSIM_MODEL" value="&quot;simple_ardrone2&quot;"/>
+    <define name="SENSORS_PARAMS" value="&quot;nps_sensors_params_ardrone2.h&quot;"/>
   </section>
 
   <section name="AUTOPILOT">

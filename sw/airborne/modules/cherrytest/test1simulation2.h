@@ -30,8 +30,28 @@
 #include "subsystems/navigation/waypoints.h"
 #include "subsystems/navigation/common_flight_plan.h"
 #include "subsystems/navigation/traffic_info.h"
-
+#include "avoidcalculations.h"
 #include "messages.h"
 #include "dl_protocol.h"
-int avoid_detection2();
+
+#include <stdio.h>
+#include <time.h>
+#include "state.h"
+#include "generated/airframe.h" /* to include the AC_ID */
+#include "subsystems/datalink/datalink.h"
+#include "math.h"
+#include "subsystems/navigation/traffic_info.h"
+#include "subsystems/gps.h"
+#include "messages.h"
+#include "subsystems/datalink/downlink.h"
+#include "navigation.h"
+
+extern int avoid_detection2(void);
+extern int avoid_navigation2(void);
+float calcGlobalAngle2(float ownshipx, float ownshipy, float intruderx, float intrudery);
+float calcAzimuthAngle2(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
+
+extern int valueofdetection2;
+extern int valueofnavigation2;
+extern int safe_warning2();
 

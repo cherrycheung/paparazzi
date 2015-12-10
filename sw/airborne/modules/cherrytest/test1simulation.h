@@ -27,30 +27,25 @@
 #include "std.h"
 #include "math/pprz_geodetic_int.h"
 
-#include "subsystems/navigation/waypoints.h"
 #include "subsystems/navigation/common_flight_plan.h"
 #include "subsystems/navigation/traffic_info.h"
-#include "avoidcalculations.h"
 #include "messages.h"
 #include "dl_protocol.h"
-
 #include <stdio.h>
-#include <time.h>
-#include "state.h"
-#include "generated/airframe.h" /* to include the AC_ID */
 #include "subsystems/datalink/datalink.h"
-#include "math.h"
-#include "subsystems/navigation/traffic_info.h"
 #include "subsystems/gps.h"
 #include "messages.h"
 #include "subsystems/datalink/downlink.h"
-#include "navigation.h"
+#include "firmwares/rotorcraft/navigation.h"
 
-extern bool_t avoid_detection1(void);
-int avoid_navigation1();
-int headingset();
-float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
+extern int avoid_detection1(void);
+float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery);
 float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
+extern int avoid_navigation1(uint8_t wpb);
+extern int safe_warning1();
 
-extern int valueofdetection;
-extern int safe_warning();
+extern int valueofdetection1;
+extern int valueofnavigation1;
+extern float angle_azimuth;
+extern float own_heading_deg;
+

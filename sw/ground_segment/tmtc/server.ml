@@ -385,7 +385,7 @@ let send_aircraft_msg = fun ac ->
         let ac_info = ["ac_id", Pprz.String ac;
                        "utm_east", cm_of_m_32 pos.utm_x;
                        "utm_north", cm_of_m_32 pos.utm_y;
-                       "course", Pprz.Int (truncate (10. *. (Geometry_2d.rad2deg a.course)));
+                       "course", Pprz.Int (truncate (10. *.(Geometry_2d.rad2deg a.course)));
                        "alt", cm_of_m_32 a.alt;
                        "speed", cm_of_m a.gspeed;
                        "climb", cm_of_m a.climb;
