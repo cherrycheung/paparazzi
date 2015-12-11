@@ -149,7 +149,7 @@ void waypoint_set_xy_i(uint8_t wp_id, int32_t x, int32_t y)
   }
 }
 
-void waypoint_set_cherry(uint8_t wp_id)
+void waypoint_set_cherry(uint8_t wp_id,float x_inc, float y_inc)
 {
   if (wp_id >= nb_waypoint) {
     return;
@@ -159,11 +159,10 @@ printf("first");
     waypoint_set_latlon(wp_id, stateGetPositionLla_i());
   } else {
 printf("second");
-    waypoints[wp_id].enu_i.x = stateGetPositionEnu_i()->x;
-    waypoints[wp_id].enu_i.y = stateGetPositionEnu_i()->y;
-printf("%d %d\n", waypoints[wp_id].enu_i.x, waypoints[wp_id].enu_i.y);
+    waypoints[wp_id].enu_i.x = stateGetPositionEnu_i()->x + POS_BFP_OF_REAL(x_inc);
+    waypoints[wp_id].enu_i.y = stateGetPositionEnu_i()->y + POS_BFP_OF_REAL(y_inc);
     /* also update ENU float representation */
-    waypoints[wp_id].enu_f.x = POS_FLOAT_OF_BFP(stateGetPositionEnu_i()->x);
+    waypoints[wp_id].enu_f.x = POS_FLOAT_OF_BFP(stateGetPositionEnu_i()->x) ;
     waypoints[wp_id].enu_f.y = POS_FLOAT_OF_BFP(stateGetPositionEnu_i()->y);
 
     waypoint_globalize(wp_id);

@@ -95,7 +95,7 @@ extern void waypoint_set_here_2d(uint8_t wp_id);
 /* functions to set fixedpoint representation directly */
 extern void waypoint_set_enu_i(uint8_t wp_id, struct EnuCoor_i *enu);
 extern void waypoint_set_xy_i(uint8_t wp_id, int32_t x, int32_t y);
-extern void waypoint_set_cherry(uint8_t wp_id);
+extern void waypoint_set_cherry(uint8_t wp_id, float x_new, float y_new);
 extern void waypoint_set_alt_i(uint8_t wp_id, int32_t alt);
 extern void waypoint_set_lla(uint8_t wp_id, struct LlaCoor_i *lla);
 

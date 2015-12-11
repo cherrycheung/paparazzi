@@ -43,6 +43,7 @@ int valueofdetection1 = 0;
 int valueofnavigation1 = 0;
 float azimuth = 0;
 float own_heading = 0;
+float d_avo = 0;
 
 int avoid_detection1()
 {
@@ -83,7 +84,7 @@ int avoid_detection1()
   
   /* Avoidance data */
   float rpz = 0.5; 
-  float d_avo = 1.0; 
+  d_avo = 2.0; 
   float d_oi = sqrt((own_pos_x - int_pos_x)*(own_pos_x - int_pos_x) + (own_pos_y - int_pos_y)*(own_pos_y - int_pos_y)); 
   
   printf("valueofdetection1 = %d\n",valueofdetection1);
@@ -126,31 +127,20 @@ int avoid_detection1()
   /* MAINTAIN when element isnt inside VO */
   /* MISSION when direction can be set as the goal */
 
-int avoid_navigation1(uint8_t wpb){
-  NavCherry(wpb);
+int avoid_navigation1(uint8_t wpb,float angle_avoid){
+  float angle_avoidance;
+  angle_avoidance = own_heading + angle_avoid;
+  float angle_avoidance_rad = angle_avoidance/180*M_PI;
+  
+  float x_new = d_avo * sin(angle_avoidance_rad);
+  float y_new = d_avo * cos(angle_avoidance_rad);
+ 
+  printf("angle_avoidance %f %f\n",x_inc,y_inc);
+  
+  NavCherry(wpb,x_new,y_new);
+  nav_set_heading_towards(x_inc + stateGetPositionEnu_f()->x, y_inc + stateGetPositionEnu_f()->y);
   NavGotoWaypoint(wpb);
-  
-  /*float angle_avoidance;
-  if (azimuth >= 0){
-    angle_avoidance = own_heading + angle_avoid;
-  }
-  else{
-    angle_avoidance = own_heading - angle_avoid;
-  }
-  
-  printf("own heading %f, angle_avoidance %f, azimuth %f\n",own_heading,angle_avoidance,azimuth);
-
-  float waypoint_old_x = stateGetPositionEnu_f()->x;
-  float waypoint_old_y = stateGetPositionEnu_f()->y;
-
-  int32_t waypoint_new_x = -1.;/*waypoint_old_x -3.0;
-  int32_t waypoint_new_y = -1.;/*waypoint_old_y -3.0;
-  printf("%f %f %d %d\n",waypoint_old_x,waypoint_old_y,waypoint_new_x,waypoint_new_y);
-  waypoint_set_xy_i(wpb, waypoint_new_x, waypoint_new_y);*/
-
-  /*NavGotoWaypoint*/
 return 0;
-
 }
   
 int safe_warning1(){
