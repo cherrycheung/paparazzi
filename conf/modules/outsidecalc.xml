@@ -1,0 +1,18 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="outsidecalc" dir="cherrytest">
+  <doc>
+    <description>
+	Cherry's module
+    </description>
+
+  </doc>
+
+  <header>
+    <file name="outsidecalc.h"/>
+  </header>
+  <!--datalink message="ACINFO" fun="ParseACINFO()"/-->
+  <makefile>
+    <file name="outsidecalc.c"/>
+  </makefile>
+</module>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014
+ * Copyright (C) 2015
  *
  * This file is part of paparazzi.
  *
@@ -20,21 +20,11 @@
  *
  */
 
-/** \file test1simulation2.h
- *  \brief testing testing testing!
- */
-
-#include "std.h"
-#include "math/pprz_geodetic_int.h"
-
-#include "subsystems/navigation/waypoints.h"
-#include "subsystems/navigation/common_flight_plan.h"
-#include "subsystems/navigation/traffic_info.h"
-#include "messages.h"
-#include "dl_protocol.h"
-
 #include <stdio.h>
+#include <std.h>
+#include <stdlib.h>
 #include <time.h>
+#include "cherrytest/test1simulation.h"
 #include "state.h"
 #include "generated/airframe.h" /* to include the AC_ID */
 #include "subsystems/datalink/datalink.h"
@@ -44,12 +34,12 @@
 #include "messages.h"
 #include "subsystems/datalink/downlink.h"
 #include "navigation.h"
+#include "generated/flight_plan.h"  //needed to use WP_HOME
+#include "subsystems/ins.h"
+#include "math/pprz_geodetic_float.h"
 
-extern int avoid_detection2(void);
-extern int avoid_navigation2(void);
-float calcGlobalAngle2(float ownshipx, float ownshipy, float intruderx, float intrudery);
-float calcAzimuthAngle2(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
 
-extern int valueofdetection2;
-extern int valueofnavigation2;
-extern int safe_warning2();
+int safe_warning1(){
+  valueofdetection1 = 0;
+return 0;
+}

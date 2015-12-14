@@ -47,17 +47,24 @@ float d_avo = 0;
 
 int avoid_detection1()
 {
+  float own_pos_x = stateGetPositionEnu_f()->x;
+  float own_pos_y = stateGetPositionEnu_f()->y;
+  float own_speed_x = stateGetSpeedEnu_f()->x;
+  float own_speed_y = stateGetSpeedEnu_f()->y;
+  float own_course_rad = *stateGetHorizontalSpeedDir_f();
+  float own_course_deg = (own_course_rad/M_PI)*180;
+  float own_heading_rad = stateGetNedToBodyEulers_f()->psi;
+  float own_heading_deg = (own_heading_rad/M_PI)*180;
+
   /* To construct the package of incoming data */
   int ac_id2 = 207;
   struct ac_info_ * intr = get_ac_info(ac_id2);
   struct ac_info_ intruder;
-  
   intruder.ac_id = intr->ac_id;
   intruder.course = intr->course;
   intruder.east = intr->east - 594535.5000;
   intruder.north = intr->north - 5760891.5000;
   intruder.gspeed = intr->gspeed;
-  
   float int_pos_x = intruder.east;
   float int_pos_y = intruder.north;
   float int_heading_rad;
@@ -70,79 +77,71 @@ int avoid_detection1()
   float int_heading_deg = (int_heading_rad/M_PI)*180;
   float int_speed_x = cos((intruder.course)*-1+0.5*M_PI)*intruder.gspeed;
   float int_speed_y = sin((intruder.course)*-1+0.5*M_PI)*intruder.gspeed;
-  
-  float own_pos_x = stateGetPositionEnu_f()->x;
-  float own_pos_y = stateGetPositionEnu_f()->y;
-  float own_speed_x = stateGetSpeedEnu_f()->x;
-  float own_speed_y = stateGetSpeedEnu_f()->y;
-  float own_course_rad = *stateGetHorizontalSpeedDir_f();
-  float own_course_deg = (own_course_rad/M_PI)*180;
-  float own_heading_rad = stateGetNedToBodyEulers_f()->psi;
-  float own_heading_deg = (own_heading_rad/M_PI)*180;
-  float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y);  
+
+  float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y);
   float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
-  
+
   /* Avoidance data */
-  float rpz = 0.5; 
-  d_avo = 2.0; 
-  float d_oi = sqrt((own_pos_x - int_pos_x)*(own_pos_x - int_pos_x) + (own_pos_y - int_pos_y)*(own_pos_y - int_pos_y)); 
-  
-  printf("valueofdetection1 = %d\n",valueofdetection1);
-  
+  float rpz = 0.5;
+  d_avo = 1.5;
+  float d_oi = sqrt((own_pos_x - int_pos_x)*(own_pos_x - int_pos_x) + (own_pos_y - int_pos_y)*(own_pos_y - int_pos_y));
+
+  /*printf("heading and global %f %f %f ",stateGetPositionEnu_f()->x,angle_global-90,angle_global+90);*/
+  printf("drone1: %d", valueofdetection1);
+
   if (d_oi > rpz){
     if (own_heading_deg > (angle_global - 90) &&  own_heading_deg < (angle_global + 90)){
       float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
-      float r_vo = rpz * (sqrt(d_oi*d_oi - rpz*rpz))/d_oi;
-      float alpha_vo = atan(r_vo/d_vo);
-      float theta_vo = 0.00;
-    
-      /* theta_vo = 0 in this case because we have a 2D case */ 
+      float alpha_vo = atan((rpz * (sqrt(d_oi*d_oi - rpz*rpz))/d_oi)/d_vo);
+      /* float theta_vo = 0.00; */
       float DD_vo[2];
-      DD_vo[0] = d_vo * cos(angle_azimuth) * cos(theta_vo);
-      DD_vo[1] = d_vo * sin(angle_azimuth) * cos(theta_vo);
-    
-      float BB = (own_speed_x - int_speed_x) * DD_vo[0] + (own_speed_y - int_speed_y) * DD_vo[1];
-      float CC = sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo;
-      float avoid_angle = acos(BB/(CC));
-    
-      if (avoid_angle < alpha_vo && (BB/CC) > 0){
-	if (d_oi < d_avo){
-	  printf("drone 1 : colliding\n");
-	  printf("valueofdetection1 = %d\n",valueofdetection1);
-	  valueofdetection1 = 1;
-	  azimuth = angle_azimuth;
-	  own_heading = own_heading_deg;
-	  return(1);
-	}
-      }
+      DD_vo[0] = d_vo * cos(angle_azimuth); /** cos(theta_vo);*/
+      DD_vo[1] = d_vo * sin(angle_azimuth); /** cos(theta_vo);*/
+
+      float BB = ((own_speed_x - int_speed_x) * DD_vo[0] + (own_speed_y - int_speed_y) * DD_vo[1])/(sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
+      float avoid_angle = acos(BB);
+
+      if (avoid_angle < alpha_vo && (BB) > 0){
+	       if (d_oi < d_avo){
+	          printf("  colliding");
+	          valueofdetection1 = 1;
+	          azimuth = angle_azimuth;
+	          own_heading = own_heading_deg;
+	          return(1);
+          }
+          else{
+            printf("  not close");
+          }
+        }
+        else{
+          printf("  not colliding");
+        }
     }
     else{
+      printf("  outside angle");
     }
+    printf(" \n");
   }
   return(0);
+  printf(" \n");
 }
 
-  /* START TURN */
-  /* TURN when element is inside VO */
-  /* MAINTAIN when element isnt inside VO */
-  /* MISSION when direction can be set as the goal */
+
 
 int avoid_navigation1(uint8_t wpb,float angle_avoid){
   float angle_avoidance;
   angle_avoidance = own_heading + angle_avoid;
   float angle_avoidance_rad = angle_avoidance/180*M_PI;
-  
-  float x_new = d_avo * sin(angle_avoidance_rad);
-  float y_new = d_avo * cos(angle_avoidance_rad);
- 
-  printf("angle_avoidance %f %f\n",x_inc,y_inc);
-  
-  NavCherry(wpb,x_new,y_new);
+
+  float x_inc = d_avo * sin(angle_avoidance_rad);
+  float y_inc = d_avo * cos(angle_avoidance_rad);
+
+  NavCherry(wpb,x_inc,y_inc);
   nav_set_heading_towards(x_inc + stateGetPositionEnu_f()->x, y_inc + stateGetPositionEnu_f()->y);
   NavGotoWaypoint(wpb);
-return 0;
+  return 0;
 }
-  
+
 int safe_warning1(){
   valueofdetection1 = 0;
 return 0;
@@ -204,7 +203,7 @@ float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float i
 	}
 	else if(angleownship<(global_angle1-180) && angleownship>-180){
 	  azimuth_angle = 180-global_angle1+abs(angleownship);
-	} 
+	}
 	else{
 	  azimuth_angle = abs(angleownship)-global_angle1;
 	}
@@ -219,7 +218,7 @@ float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float i
 	}
 	else if(angleownship>(global_angle1+180) && angleownship<180){
 	  azimuth_angle = -1* (360 - angleownship-abs(global_angle1));
-	} 
+	}
 	else{
 	  azimuth_angle = -1*( abs(angleownship)-abs(global_angle1));
 	}
@@ -245,7 +244,7 @@ float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float i
 	}
 	else if(angleownship<0 && angleownship>(global_angle1-180)){
 	  azimuth_angle = global_angle1+abs(angleownship);
-	} 
+	}
 	else{
 	  azimuth_angle = 360-abs(global_angle1)-abs(angleownship);
 	}
@@ -260,7 +259,7 @@ float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float i
 	}
 	else if(angleownship>0 && angleownship<(global_angle1+180)){
 	  azimuth_angle = -1* (abs(global_angle1)+abs(angleownship));
-	} 
+	}
 	else{
 	  azimuth_angle = -1*(360-abs(global_angle1)-abs(angleownship));
 	}

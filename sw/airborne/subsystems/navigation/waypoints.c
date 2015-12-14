@@ -158,7 +158,6 @@ void waypoint_set_cherry(uint8_t wp_id,float x_inc, float y_inc)
 printf("first");
     waypoint_set_latlon(wp_id, stateGetPositionLla_i());
   } else {
-printf("second");
     waypoints[wp_id].enu_i.x = stateGetPositionEnu_i()->x + POS_BFP_OF_REAL(x_inc);
     waypoints[wp_id].enu_i.y = stateGetPositionEnu_i()->y + POS_BFP_OF_REAL(y_inc);
     /* also update ENU float representation */

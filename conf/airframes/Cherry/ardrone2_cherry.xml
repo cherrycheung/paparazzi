@@ -23,8 +23,8 @@
     <subsystem name="ins" type="extended"/>
   </firmware>
 
-  <modules main_freq="256">
-<load name="test1simulation.xml"/>
+  <modules main_freq="60">
+    <load name="test1simulation.xml"/>
   </modules>
 
   <commands>
@@ -187,7 +187,7 @@
     <define name="PGAIN" value="79"/>
     <define name="DGAIN" value="100"/>
     <define name="IGAIN" value="30"/>
- <define name="REF_MAX_SPEED" value="0.25"/>
+ <define name="REF_MAX_SPEED" value="0.3"/>
   </section>
 
   <section name="SIMULATOR" prefix="NPS_">

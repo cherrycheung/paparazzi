@@ -1,9 +1,9 @@
 <!DOCTYPE module SYSTEM "module.dtd">
 
-<module name="test1simulation22" dir="cherrytest">
+<module name="test1simulation2" dir="cherrytest">
   <doc>
     <description>
-	Let me try to a calculation here in simulation   
+	Let me try to a calculation here in simulation
     </description>
     <define name="HOME_AC_ID"               description="home"/>
 
