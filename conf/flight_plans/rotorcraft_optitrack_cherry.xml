@@ -69,53 +69,53 @@
     </block>
 
 
-    <block name="to 2" pre_call="avoid_detection1()">
+    <block name="mission to 2" pre_call="avoid_detection1()">
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
       <stay until="stage_time>5" wp="p1"/>
-      <exception cond="valueofdetection1 == 1" deroute="avoid 2"/>
+      <exception cond="valueofdetection1 == 1" deroute="turn 2"/>
       <stay until="stage_time>5" wp="p2"/>
-      <deroute block="to 1"/>
+      <deroute block="mission to 1"/>
     </block>
 
 
-    <block name="to 1" pre_call="avoid_detection1()">
+    <block name="mission to 1" pre_call="avoid_detection1()">
       <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
       <stay until="stage_time>5" wp="p2"/>
-      <exception cond="valueofdetection1 == 1" deroute="avoid 1"/>
+      <exception cond="valueofdetection1 == 1" deroute="turn 1"/>
       <stay until="stage_time>5" wp="p1"/>
-      <deroute block="to 2"/>
+      <deroute block="mission to 2"/>
     </block>
 
-    <block name="avoid 2">
+    <block name="turn 2">
       <call fun="avoid_navigation1(WP_FLEX2,30)"/>
       <call fun="safe_warning1()"/>
       <call fun="avoid_detection1()"/>
-      <exception cond="valueofdetection1 == 1" deroute="avoid 2"/>
+      <exception cond="valueofdetection1 == 1" deroute="turn 2"/>
       <stay until="stage_time>5"wp="FLEX2"/>
-      <deroute block="continue to 2"/>
+      <deroute block="maintain 2"/>
     </block>
 
-    <block name="avoid 1">
+    <block name="turn 1">
       <call fun="avoid_navigation1(WP_FLEX2,30)"/>
       <call fun="safe_warning1()"/>
       <stay until="stage_time>5"wp="FLEX2"/>
       <call fun="avoid_detection1()"/>
-      <exception cond="valueofdetection1 == 1" deroute="avoid 1"/>
-      <deroute block="continue to 1"/>
+      <exception cond="valueofdetection1 == 1" deroute="turn 1"/>
+      <deroute block="maintain 1"/>
     </block>
 
-    <block name="continue to 2" pre_call="avoid_detection1()">
-      <exception cond="valueofdetection1 == 1" deroute="avoid 2"/>
+    <block name="maintain 2" pre_call="avoid_detection1()">
+      <exception cond="valueofdetection1 == 1" deroute="turn 2"/>
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
       <stay until="stage_time>5" wp="p2"/>
-      <deroute block="to 1"/>
+      <deroute block="mission to 1"/>
     </block>
 
-    <block name="continue to 1" pre_call="avoid_detection1()">
-      <exception cond="valueofdetection1 == 1" deroute="avoid 1"/>
+    <block name="maintain 1" pre_call="avoid_detection1()">
+      <exception cond="valueofdetection1 == 1" deroute="turn 1"/>
       <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
       <stay until="stage_time>5" wp="p1"/>
-      <deroute block="to 2"/>
+      <deroute block="mission to 2"/>
     </block>
 
     <!--block name="init">
