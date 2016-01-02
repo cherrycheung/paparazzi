@@ -38,7 +38,6 @@
 #include "subsystems/ins.h"
 #include "math/pprz_geodetic_float.h"
 
-
 int valueofdetection1 = 0;
 int valueofnavigation1 = 0;
 float azimuth = 0;
@@ -47,6 +46,7 @@ float d_avo = 0;
 
 int avoid_detection1()
 {
+  // OWN coordinates
   float own_pos_x = stateGetPositionEnu_f()->x;
   float own_pos_y = stateGetPositionEnu_f()->y;
   float own_speed_x = stateGetSpeedEnu_f()->x;
@@ -56,7 +56,7 @@ int avoid_detection1()
   float own_heading_rad = stateGetNedToBodyEulers_f()->psi;
   float own_heading_deg = (own_heading_rad/M_PI)*180;
 
-  /* To construct the package of incoming data */
+  // INTRUDER coordinates
   int ac_id2 = 207;
   struct ac_info_ * intr = get_ac_info(ac_id2);
   struct ac_info_ intruder;
@@ -75,8 +75,8 @@ int avoid_detection1()
     int_heading_rad = intruder.course;
   }
   float int_heading_deg = (int_heading_rad/M_PI)*180;
-  float int_speed_x = cos((intruder.course)*-1+0.5*M_PI)*intruder.gspeed;
-  float int_speed_y = sin((intruder.course)*-1+0.5*M_PI)*intruder.gspeed;
+  float int_speed_x = cos((intruder.course)*-1 + 0.5*M_PI)*intruder.gspeed;
+  float int_speed_y = sin((intruder.course)*-1 + 0.5*M_PI)*intruder.gspeed;
 
   float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y);
   float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
@@ -86,8 +86,8 @@ int avoid_detection1()
   d_avo = 1.5;
   float d_oi = sqrt((own_pos_x - int_pos_x)*(own_pos_x - int_pos_x) + (own_pos_y - int_pos_y)*(own_pos_y - int_pos_y));
 
-  /*printf("heading and global %f %f %f ",stateGetPositionEnu_f()->x,angle_global-90,angle_global+90);*/
-  printf("drone1: %d", valueofdetection1);
+  printf("global %f", angle_global);
+  //printf("drone1: %d", valueofdetection1);
 
   if (d_oi > rpz){
     if (own_heading_deg > (angle_global - 90) &&  own_heading_deg < (angle_global + 90)){
@@ -125,8 +125,6 @@ int avoid_detection1()
   return(0);
   printf(" \n");
 }
-
-
 
 int avoid_navigation1(uint8_t wpb,float angle_avoid){
   float angle_avoidance;
