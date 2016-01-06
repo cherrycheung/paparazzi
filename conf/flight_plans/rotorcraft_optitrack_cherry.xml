@@ -63,11 +63,58 @@
       <call fun="NavSetWaypointHere(WP_CLIMB)"/>
       <stay climb="0.5" vmode="climb" wp="CLIMB"/>
     </block>
+
     <block name="Standby" strip_button="Standby" strip_icon="home.png">
       <stay until="stage_time>3" wp="STDBY"/>
-      <stay until="stage_time>8" wp="p1"/>
+      <stay wp="p1"/>
     </block>
 
+    <block name="1" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
+      <stay until="stage_time>4" wp="p1"/>
+      <exception cond="valueofdetection1 == 1" deroute="1b"/>
+      <stay until="stage_time>7" wp="p2"/>
+      <deroute block="2"/>
+    </block>
+
+    <block name="2" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
+      <stay until="stage_time>4" wp="p2"/>
+      <exception cond="valueofdetection1 == 1" deroute="turn 2"/>
+      <stay until="stage_time>7" wp="p1"/>
+      <deroute block="1"/>
+    </block>
+
+    <block name="1b">
+      <call fun="safe_warning1()"/>
+      <call fun="avoid_navigation1(WP_FLEX2,30)"/>
+      <call fun="avoid_detection1()"/>
+      <!--exception cond="valueofdetection1 == 1" deroute="1bb"/-->
+      <stay until="stage_time>3"wp="FLEX2"/>
+      <deroute block="1c"/>
+    </block>
+
+    <!--block name="1bb">
+      <call fun="safe_warning1()"/>
+      <call fun="avoid_navigation1(WP_FLEX2,30)"/>
+      <call fun="avoid_detection1()"/>
+      <exception cond="valueofdetection1 == 1" deroute="1bbb"/>
+      <stay until="stage_time>3"wp="FLEX2"/>
+      <deroute block="1c"/>
+    </block>
+
+    <block name="1bbb">
+      <call fun="safe_warning1()"/>
+      <call fun="avoid_navigation1(WP_FLEX2,30)"/>
+      <stay until="stage_time>3"wp="FLEX2"/>
+      <deroute block="1c"/>
+    </block-->
+
+    <block name="1c">
+      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
+      <stay until="stage_time>7" wp="p2"/>
+      <deroute block="2"/>
+    </block>
 
     <block name="mission to 2" pre_call="avoid_detection1()">
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
@@ -76,7 +123,6 @@
       <stay until="stage_time>5" wp="p2"/>
       <deroute block="mission to 1"/>
     </block>
-
 
     <block name="mission to 1" pre_call="avoid_detection1()">
       <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>

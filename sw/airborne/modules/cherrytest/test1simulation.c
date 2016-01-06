@@ -86,44 +86,52 @@ int avoid_detection1()
   d_avo = 1.5;
   float d_oi = sqrt((own_pos_x - int_pos_x)*(own_pos_x - int_pos_x) + (own_pos_y - int_pos_y)*(own_pos_y - int_pos_y));
 
-  printf("global %f", angle_global);
-  //printf("drone1: %d", valueofdetection1);
+  //printf("global %f", angle_global);
+  printf("drone1: %d      ", valueofdetection1);
 
+  // YAZDI'S EQUATIONS
+  float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
+  float alpha_vo = atan((rpz * (sqrt(d_oi*d_oi - rpz*rpz))/d_oi)/d_vo);
+  /* float theta_vo = 0.00; */
+  float DD_vo[2];
+  DD_vo[0] = d_vo * cos(angle_azimuth); /** cos(theta_vo);*/
+  DD_vo[1] = d_vo * sin(angle_azimuth); /** cos(theta_vo);*/
+  float BB = ((own_speed_x - int_speed_x) * DD_vo[0] + (own_speed_y - int_speed_y) * DD_vo[1])/(sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
+  float avoid_angle = acos(BB);
+
+  printf("%f %f %f   ",avoid_angle,alpha_vo,BB);
+        //printf("avoid_angles are %f %f %f  ",avoid_angle,alpha_vo,BB);
   if (d_oi > rpz){
     if (own_heading_deg > (angle_global - 90) &&  own_heading_deg < (angle_global + 90)){
-      float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
-      float alpha_vo = atan((rpz * (sqrt(d_oi*d_oi - rpz*rpz))/d_oi)/d_vo);
-      /* float theta_vo = 0.00; */
-      float DD_vo[2];
-      DD_vo[0] = d_vo * cos(angle_azimuth); /** cos(theta_vo);*/
-      DD_vo[1] = d_vo * sin(angle_azimuth); /** cos(theta_vo);*/
+      if (avoid_angle < alpha_vo){
+        //printf("  first %f %f", avoid_angle,alpha_vo,BB);
+        if(BB>0){
+          //printf("  second  %f", BB);
+          if (d_oi < d_avo){
+             printf("  colliding");
+             valueofdetection1 = 1;
+             azimuth = angle_azimuth;
+             own_heading = own_heading_deg;
+             return(1);
+           }
+           else{
+             printf("  not close");
+           }
 
-      float BB = ((own_speed_x - int_speed_x) * DD_vo[0] + (own_speed_y - int_speed_y) * DD_vo[1])/(sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
-      float avoid_angle = acos(BB);
+        }
 
-      if (avoid_angle < alpha_vo && (BB) > 0){
-	       if (d_oi < d_avo){
-	          printf("  colliding");
-	          valueofdetection1 = 1;
-	          azimuth = angle_azimuth;
-	          own_heading = own_heading_deg;
-	          return(1);
-          }
-          else{
-            printf("  not close");
-          }
-        }
-        else{
-          printf("  not colliding");
-        }
+      }
+
+
     }
-    else{
-      printf("  outside angle");
-    }
-    printf(" \n");
+    ////else{
+    ////  printf("  outside angle");
+    ////}
+printf(" \n");
   }
   return(0);
   printf(" \n");
+
 }
 
 int avoid_navigation1(uint8_t wpb,float angle_avoid){
