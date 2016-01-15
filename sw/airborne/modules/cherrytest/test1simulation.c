@@ -83,55 +83,52 @@ int avoid_detection1()
 
   /* Avoidance data */
   float rpz = 0.5;
-  d_avo = 1.5;
-  float d_oi = sqrt((own_pos_x - int_pos_x)*(own_pos_x - int_pos_x) + (own_pos_y - int_pos_y)*(own_pos_y - int_pos_y));
-
-  //printf("global %f", angle_global);
-  printf("drone1: %d      ", valueofdetection1);
+  d_avo = 1.85;
+  float d_oi = sqrt(powf((own_pos_x - int_pos_x),2) + powf((own_pos_y - int_pos_y),2));
 
   // YAZDI'S EQUATIONS
   float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
-  float alpha_vo = atan((rpz * (sqrt(d_oi*d_oi - rpz*rpz))/d_oi)/d_vo);
+  float r_vo = rpz*((sqrt(d_oi*d_oi - rpz*rpz))/d_oi);
+  float alpha_vo = atan(r_vo/d_vo);
   /* float theta_vo = 0.00; */
   float DD_vo[2];
   DD_vo[0] = d_vo * cos(angle_azimuth); /** cos(theta_vo);*/
   DD_vo[1] = d_vo * sin(angle_azimuth); /** cos(theta_vo);*/
-  float BB = ((own_speed_x - int_speed_x) * DD_vo[0] + (own_speed_y - int_speed_y) * DD_vo[1])/(sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
+  float AA = (own_speed_x-int_speed_x)*DD_vo[0]+(own_speed_y-int_speed_y)*DD_vo[1];
+  float AAA = sqrt(powf((own_speed_x-int_speed_x),2)+powf((own_speed_y-int_speed_y),2))*d_vo;
+  float BB = AA/AAA;
+
+  (sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
   float avoid_angle = acos(BB);
 
-  printf("%f %f %f   ",avoid_angle,alpha_vo,BB);
-        //printf("avoid_angles are %f %f %f  ",avoid_angle,alpha_vo,BB);
+  printf("drone1: %f  %f  %f  %f  \n",avoid_angle,alpha_vo,AA,AAA);
+
   if (d_oi > rpz){
-    if (own_heading_deg > (angle_global - 90) &&  own_heading_deg < (angle_global + 90)){
-      if (avoid_angle < alpha_vo){
-        //printf("  first %f %f", avoid_angle,alpha_vo,BB);
-        if(BB>0){
-          //printf("  second  %f", BB);
-          if (d_oi < d_avo){
-             printf("  colliding");
-             valueofdetection1 = 1;
-             azimuth = angle_azimuth;
-             own_heading = own_heading_deg;
-             return(1);
-           }
-           else{
-             printf("  not close");
-           }
-
-        }
-
+    if (own_heading_deg > (angle_global - 70) &&  own_heading_deg < (angle_global + 70)){
+      if (d_oi < d_avo){
+          if (avoid_angle < alpha_vo && BB > 0){
+            valueofdetection1 = 1;
+            printf("  avoid mode \n");
+            azimuth = angle_azimuth;
+            own_heading = own_heading_deg;
+            return(1);
+          }
+          else if(avoid_angle < alpha_vo && BB < 0){
+            //printf("  maintain mode 1");
+          }
+          else if(avoid_angle > alpha_vo && BB > 0){
+            //printf("  maintain mode 2");
+          }
+          else if(avoid_angle > alpha_vo && BB < 0){
+            //printf("  maintain mode 3");
+          }
       }
-
-
     }
-    ////else{
-    ////  printf("  outside angle");
-    ////}
-printf(" \n");
+    //printf(" \n");
   }
-  return(0);
-  printf(" \n");
 
+  return(0);
+  //printf(" \n");
 }
 
 int avoid_navigation1(uint8_t wpb,float angle_avoid){
@@ -139,8 +136,8 @@ int avoid_navigation1(uint8_t wpb,float angle_avoid){
   angle_avoidance = own_heading + angle_avoid;
   float angle_avoidance_rad = angle_avoidance/180*M_PI;
 
-  float x_inc = d_avo * sin(angle_avoidance_rad);
-  float y_inc = d_avo * cos(angle_avoidance_rad);
+  float x_inc = d_avo*1.2 * sin(angle_avoidance_rad);
+  float y_inc = d_avo*1.2 * cos(angle_avoidance_rad);
 
   NavCherry(wpb,x_inc,y_inc);
   nav_set_heading_towards(x_inc + stateGetPositionEnu_f()->x, y_inc + stateGetPositionEnu_f()->y);
@@ -148,8 +145,9 @@ int avoid_navigation1(uint8_t wpb,float angle_avoid){
   return 0;
 }
 
-int safe_warning1(){
+int safe_setting1(){
   valueofdetection1 = 0;
+  printf("Value of detection has been resetted\n");
 return 0;
 }
 
@@ -200,114 +198,114 @@ float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float i
       azimuth_angle = angleownship;
     }
       else if(intruderx > ownshipx){ /* situation 2 */
-	global_angle1 = (atan(((intruderx - ownshipx))/((intrudery - ownshipy))))/M_PI * 180;
-	if(angleownship<0 && angleownship>(global_angle1-180)){
-	  azimuth_angle = -1* ( abs(angleownship)+global_angle1) ;
-	}
-	else if(angleownship>0 && angleownship<global_angle1){
-	  azimuth_angle = -1* (global_angle1 - angleownship);
-	}
-	else if(angleownship<(global_angle1-180) && angleownship>-180){
-	  azimuth_angle = 180-global_angle1+abs(angleownship);
-	}
-	else{
-	  azimuth_angle = abs(angleownship)-global_angle1;
-	}
+	       global_angle1 = (atan(((intruderx - ownshipx))/((intrudery - ownshipy))))/M_PI * 180;
+	        if(angleownship<0 && angleownship>(global_angle1-180)){
+	           azimuth_angle = -1* ( abs(angleownship)+global_angle1) ;
+	        }
+	        else if(angleownship>0 && angleownship<global_angle1){
+	           azimuth_angle = -1* (global_angle1 - angleownship);
+	        }
+	        else if(angleownship<(global_angle1-180) && angleownship>-180){
+	           azimuth_angle = 180-global_angle1+abs(angleownship);
+	        }
+	        else{
+	           azimuth_angle = abs(angleownship)-global_angle1;
+	        }
       }
       else if(intruderx < ownshipx){ /* situation 3 */
-	global_angle1 =  atan(((intruderx - ownshipx))/((intrudery - ownshipy)))/M_PI * 180;
-	if(angleownship>0 && angleownship<(global_angle1+180)){
-	  azimuth_angle = abs(global_angle1)+angleownship;
-	}
-	else if(angleownship<0 && angleownship>global_angle1){
-	  azimuth_angle = abs(global_angle1) - abs(angleownship);
-	}
-	else if(angleownship>(global_angle1+180) && angleownship<180){
-	  azimuth_angle = -1* (360 - angleownship-abs(global_angle1));
-	}
-	else{
-	  azimuth_angle = -1*( abs(angleownship)-abs(global_angle1));
-	}
+	       global_angle1 =  atan(((intruderx - ownshipx))/((intrudery - ownshipy)))/M_PI * 180;
+	        if(angleownship>0 && angleownship<(global_angle1+180)){
+	           azimuth_angle = abs(global_angle1)+angleownship;
+	        }
+	        else if(angleownship<0 && angleownship>global_angle1){
+	           azimuth_angle = abs(global_angle1) - abs(angleownship);
+	        }
+	        else if(angleownship>(global_angle1+180) && angleownship<180){
+	           azimuth_angle = -1* (360 - angleownship-abs(global_angle1));
+	        }
+	        else{
+	           azimuth_angle = -1*( abs(angleownship)-abs(global_angle1));
+	        }
       }
     }
     else if(intrudery < ownshipy){
       if(intruderx == ownshipx){ /* situation 4 */
-	global_angle1 = 180;
-	if(angleownship > 0){
-	  azimuth_angle = -1 *  (global_angle1 - abs(angleownship));
-	}
-	else{
-	  azimuth_angle = (global_angle1 - abs(angleownship));
-	}
+	       global_angle1 = 180;
+	        if(angleownship > 0){
+	           azimuth_angle = -1 *  (global_angle1 - abs(angleownship));
+	        }
+	        else{
+	           azimuth_angle = (global_angle1 - abs(angleownship));
+	          }
+          }
+        else if(intruderx > ownshipx){  /* situation 5 */
+	         global_angle1 = 180-(-1)*(atan((intruderx - ownshipx)/((intrudery - ownshipy))))/M_PI * 180;
+	          if(angleownship>0 && angleownship<global_angle1){
+	            azimuth_angle = -1*(global_angle1 - angleownship);
+	          }
+	          else if(angleownship<180 && angleownship>global_angle1){
+	            azimuth_angle = -1*(angleownship - global_angle1);
+	            }
+	          else if(angleownship<0 && angleownship>(global_angle1-180)){
+	            azimuth_angle = global_angle1+abs(angleownship);
+	          }
+	          else{
+	             azimuth_angle = 360-abs(global_angle1)-abs(angleownship);
+	          }
+        }
+        else if(intruderx < ownshipx){ /* situation 6 */
+	         global_angle1 =  -1 * (180 - (atan(((intruderx - ownshipx))/((intrudery - ownshipy)))/M_PI * 180));
+	          if(angleownship<0 && angleownship>global_angle1){
+	             azimuth_angle = abs(global_angle1 - angleownship);
+	          }
+	          else if(angleownship>-180 && angleownship<global_angle1){
+	             azimuth_angle = (angleownship - global_angle1);
+	          }
+	          else if(angleownship>0 && angleownship<(global_angle1+180)){
+	             azimuth_angle = -1* (abs(global_angle1)+abs(angleownship));
+	          }
+	          else{
+	             azimuth_angle = -1*(360-abs(global_angle1)-abs(angleownship));
+	          }
+        }
       }
-      else if(intruderx > ownshipx){  /* situation 5 */
-	global_angle1 = 180-(-1)*(atan((intruderx - ownshipx)/((intrudery - ownshipy))))/M_PI * 180;
-	if(angleownship>0 && angleownship<global_angle1){
-	  azimuth_angle = -1*(global_angle1 - angleownship);
-	}
-	else if(angleownship<180 && angleownship>global_angle1){
-	  azimuth_angle = -1*(angleownship - global_angle1);
-	}
-	else if(angleownship<0 && angleownship>(global_angle1-180)){
-	  azimuth_angle = global_angle1+abs(angleownship);
-	}
-	else{
-	  azimuth_angle = 360-abs(global_angle1)-abs(angleownship);
-	}
-      }
-      else if(intruderx < ownshipx){ /* situation 6 */
-	global_angle1 =  -1 * (180 - (atan(((intruderx - ownshipx))/((intrudery - ownshipy)))/M_PI * 180));
-	if(angleownship<0 && angleownship>global_angle1){
-	  azimuth_angle = abs(global_angle1 - angleownship);
-	}
-	else if(angleownship>-180 && angleownship<global_angle1){
-	  azimuth_angle = abs(angleownship - global_angle1);
-	}
-	else if(angleownship>0 && angleownship<(global_angle1+180)){
-	  azimuth_angle = -1* (abs(global_angle1)+abs(angleownship));
-	}
-	else{
-	  azimuth_angle = -1*(360-abs(global_angle1)-abs(angleownship));
-	}
-      }
-    }
-    else if(intrudery == ownshipy){ /* situation 7 */
-      if(intruderx > ownshipx){
-	global_angle1 = 90;
-	if(angleownship>0 && angleownship<global_angle1){
-	  azimuth_angle = -1*(abs(global_angle1) - abs(angleownship));
-	}
-	else if(angleownship<180 && angleownship > global_angle1){
-	  azimuth_angle = -1*(abs(angleownship) - abs(global_angle1));
-	}
-	else if(angleownship>-180 && angleownship < -90){
-	  azimuth_angle = 360-abs(angleownship)-abs(global_angle1);
-	}
-	else{
-	  azimuth_angle = abs(angleownship) + abs(global_angle1);
-	}
-      }
-      else if (intruderx < ownshipx){ /* situation 8 */
-	global_angle1 = -90;
-	if(angleownship<0 && angleownship>global_angle1){
-	  azimuth_angle = abs(global_angle1) - abs(angleownship);
-	}
-	else if(angleownship>-180 && angleownship < global_angle1){
-	  azimuth_angle = abs(angleownship) - abs(global_angle1);
-	}
-	else if(angleownship<180 && angleownship > 90){
-	  azimuth_angle = -1*(360-abs(angleownship)-abs(global_angle1));
-	}
-	else{
-	  azimuth_angle = -1*(abs(angleownship) + abs(global_angle1));
-	}
-      }
-      else if (intruderx == ownshipx){
-	global_angle1 = 0;
-        azimuth_angle = 0;
-      }
-    }
-    return(azimuth_angle);
+      else if(intrudery == ownshipy){ /* situation 7 */
+        if(intruderx > ownshipx){
+	         global_angle1 = 90;
+	          if(angleownship>0 && angleownship<global_angle1){
+	             azimuth_angle = -1*(abs(global_angle1) - abs(angleownship));
+	            }
+	          else if(angleownship<180 && angleownship > global_angle1){
+	             azimuth_angle = -1*(abs(angleownship) - abs(global_angle1));
+	            }
+	          else if(angleownship>-180 && angleownship < -90){
+	             azimuth_angle = 360-abs(angleownship)-abs(global_angle1);
+	            }
+	          else{
+	             azimuth_angle = abs(angleownship) + abs(global_angle1);
+	            }
+            }
+        else if (intruderx < ownshipx){ /* situation 8 */
+	         global_angle1 = -90;
+	          if(angleownship<0 && angleownship>global_angle1){
+	             azimuth_angle = abs(global_angle1) - abs(angleownship);
+	            }
+	          else if(angleownship>-180 && angleownship < global_angle1){
+	             azimuth_angle = abs(angleownship) - abs(global_angle1);
+	            }
+	          else if(angleownship<180 && angleownship > 90){
+	             azimuth_angle = -1*(360-abs(angleownship)-abs(global_angle1));
+	            }
+	          else{
+	             azimuth_angle = -1*(abs(angleownship) + abs(global_angle1));
+	            }
+            }
+        else if (intruderx == ownshipx){
+	         global_angle1 = 0;
+           azimuth_angle = 0;
+         }
+       }
+       return(azimuth_angle);
 }
 
 	  /*

@@ -9,8 +9,7 @@
     <waypoint name="TD" x="0.0" y="0.0"/>
     <waypoint name="CLIMB" x="0.0" y="0.0"/>
     <waypoint name="STDBY" x="0.0" y="0.0"/>
-    <waypoint name="FLEX2" x="1.0" y="1.0"/>
-    <waypoint lat="51.9906351" lon="4.3767736" name="FLEX"/>
+    <waypoint lat="51.9906136" lon="4.3767908" name="FLEX2"/>
     <waypoint lat="51.990624" lon="4.376771" name="p1"/>
     <waypoint lat="51.990643" lon="4.376821" name="p2"/>
     <waypoint lat="51.990646" lon="4.376724" name="FA1"/>
@@ -69,128 +68,74 @@
       <stay wp="p1"/>
     </block>
 
-    <block name="1" pre_call="avoid_detection1()">
+    <block name="point to 2">
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
-      <stay until="stage_time>4" wp="p1"/>
-      <exception cond="valueofdetection1 == 1" deroute="1b"/>
-      <stay until="stage_time>7" wp="p2"/>
-      <deroute block="2"/>
-    </block>
-
-    <block name="2" pre_call="avoid_detection1()">
-      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
-      <stay until="stage_time>4" wp="p2"/>
-      <exception cond="valueofdetection1 == 1" deroute="turn 2"/>
-      <stay until="stage_time>7" wp="p1"/>
-      <deroute block="1"/>
-    </block>
-
-    <block name="1b">
-      <call fun="safe_warning1()"/>
-      <call fun="avoid_navigation1(WP_FLEX2,30)"/>
-      <call fun="avoid_detection1()"/>
-      <!--exception cond="valueofdetection1 == 1" deroute="1bb"/-->
-      <stay until="stage_time>3"wp="FLEX2"/>
-      <deroute block="1c"/>
-    </block>
-
-    <!--block name="1bb">
-      <call fun="safe_warning1()"/>
-      <call fun="avoid_navigation1(WP_FLEX2,30)"/>
-      <call fun="avoid_detection1()"/>
-      <exception cond="valueofdetection1 == 1" deroute="1bbb"/>
-      <stay until="stage_time>3"wp="FLEX2"/>
-      <deroute block="1c"/>
-    </block>
-
-    <block name="1bbb">
-      <call fun="safe_warning1()"/>
-      <call fun="avoid_navigation1(WP_FLEX2,30)"/>
-      <stay until="stage_time>3"wp="FLEX2"/>
-      <deroute block="1c"/>
-    </block-->
-
-    <block name="1c">
-      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
-      <stay until="stage_time>7" wp="p2"/>
-      <deroute block="2"/>
-    </block>
-
-    <block name="mission to 2" pre_call="avoid_detection1()">
-      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
-      <stay until="stage_time>5" wp="p1"/>
-      <exception cond="valueofdetection1 == 1" deroute="turn 2"/>
-      <stay until="stage_time>5" wp="p2"/>
-      <deroute block="mission to 1"/>
-    </block>
-
-    <block name="mission to 1" pre_call="avoid_detection1()">
-      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
-      <stay until="stage_time>5" wp="p2"/>
-      <exception cond="valueofdetection1 == 1" deroute="turn 1"/>
-      <stay until="stage_time>5" wp="p1"/>
-      <deroute block="mission to 2"/>
-    </block>
-
-    <block name="turn 2">
-      <call fun="avoid_navigation1(WP_FLEX2,30)"/>
-      <call fun="safe_warning1()"/>
-      <call fun="avoid_detection1()"/>
-      <exception cond="valueofdetection1 == 1" deroute="turn 2"/>
-      <stay until="stage_time>5"wp="FLEX2"/>
-      <deroute block="maintain 2"/>
-    </block>
-
-    <block name="turn 1">
-      <call fun="avoid_navigation1(WP_FLEX2,30)"/>
-      <call fun="safe_warning1()"/>
-      <stay until="stage_time>5"wp="FLEX2"/>
-      <call fun="avoid_detection1()"/>
-      <exception cond="valueofdetection1 == 1" deroute="turn 1"/>
-      <deroute block="maintain 1"/>
-    </block>
-
-    <block name="maintain 2" pre_call="avoid_detection1()">
-      <exception cond="valueofdetection1 == 1" deroute="turn 2"/>
-      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
-      <stay until="stage_time>5" wp="p2"/>
-      <deroute block="mission to 1"/>
-    </block>
-
-    <block name="maintain 1" pre_call="avoid_detection1()">
-      <exception cond="valueofdetection1 == 1" deroute="turn 1"/>
-      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
-      <stay until="stage_time>5" wp="p1"/>
-      <deroute block="mission to 2"/>
-    </block>
-
-    <!--block name="init">
-      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
-      <stay until="stage_time>5" wp="p1"/>
-      <deroute block="1 to 2"/>
-    </block>
-    <block name="1 to 2" pre_call="avoid_detection1()">
-      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
-      <stay until="stage_time>10" wp="p2"/>
-      <exception cond="valueofdetection1 == 1" deroute="avoid 1 to 2"/>
-    </block>
-    <block name="avoid 1 to 2">
-      <call fun="avoid_navigation1()"/>
-      <exception cond="valueofnavigation1 == 0" deroute="avoidavoid"/>
-    </block>
-    <block name="avoidavoid">
-      <call fun="nav_set_heading_deg(30)"/>
-      <call fun="avoid_detection1()"/>
-    </block>
-
-    <block name="1">
-      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
       <stay wp="p1"/>
     </block>
-    <block name="2">
-      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
+
+    <block name="go to 2">
       <stay wp="p2"/>
-    </block-->
+    </block>
+
+    <block name="point to 1">
+      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
+      <stay wp="p2"/>
+    </block>
+
+    <block name="go to 1">
+      <stay wp="p1"/>
+    </block>
+
+    <block name="1 go to 2" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
+      <stay until="stage_time>3" wp="p1"/>
+      <exception cond="valueofdetection1 == 1" deroute="1 avoid"/>
+      <stay until="stage_time>7" wp="p2"/>
+      <deroute block="2 go to 1"/>
+    </block>
+
+    <block name="1 avoid">
+      <call fun="safe_setting1()"/>
+      <call fun="avoid_navigation1(WP_FLEX2,45)"/>
+      <stay until="stage_time>4"wp="FLEX2"/>
+      <deroute block="1 goal"/>
+    </block>
+
+    <block name="1 goal" pre_call="avoid_detection1()">
+      <stay until="stage_time>1"wp="FLEX2"/>
+      <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
+      <stay until="stage_time>1"wp="FLEX2"/>
+      <exception cond="valueofdetection1 == 1" deroute="1 avoid"/>
+      <stay until="stage_time>7" wp="p2"/>
+      <deroute block="2 go to 1"/>
+    </block>
+
+    <block name="2 go to 1" pre_call="avoid_detection1()">
+      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
+      <stay until="stage_time>3" wp="p2"/>
+      <exception cond="valueofdetection1 == 1" deroute="2 avoid"/>
+      <stay until="stage_time>7" wp="p1"/>
+      <deroute block="1 go to 2"/>
+    </block>
+
+    <block name="2 avoid">
+      <call fun="safe_setting1()"/>
+      <call fun="avoid_navigation1(WP_FLEX2,45)"/>
+      <stay until="stage_time>3"wp="FLEX2"/>
+      <deroute block="2 goal"/>
+    </block>
+
+    <block name="2 goal" pre_call="avoid_detection1()">
+      <stay until="stage_time>2"wp="FLEX2"/>
+      <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
+      <stay until="stage_time>2"wp="FLEX2"/>
+      <exception cond="valueofdetection1 == 1" deroute="2 avoid"/>
+      <stay until="stage_time>7" wp="p1"/>
+      <deroute block="1 go to 2"/>
+    </block>
+
+
+
     <block name="land here" strip_button="Land Here" strip_icon="land-right.png">
       <call fun="NavSetWaypointHere(WP_TD)"/>
     </block>

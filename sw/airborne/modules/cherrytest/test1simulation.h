@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 
+ * Copyright (C) 2014
  *
  * This file is part of paparazzi.
  *
@@ -42,10 +42,9 @@ extern int avoid_detection1(void);
 float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery);
 float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
 extern int avoid_navigation1(uint8_t wpb,float angle_avoid);
-extern int safe_warning1();
+extern int safe_setting1();
 
 extern int valueofdetection1;
 extern int valueofnavigation1;
 extern float angle_azimuth;
 extern float own_heading_deg;
-
