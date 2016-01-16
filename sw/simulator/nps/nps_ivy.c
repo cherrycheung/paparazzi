@@ -13,6 +13,8 @@
 #include "nps_fdm.h"
 #include "nps_sensors.h"
 #include "nps_atmosphere.h"
+#include "subsystems/navigation/traffic_info.h"
+
 
 //#include "subsystems/navigation/common_flight_plan.h"
 
@@ -48,17 +50,7 @@ static void on_ACINFO(IvyClientPtr app __attribute__((unused)),
 	SetAcInfo(id,ux, uy, c, a, s, cl, t);
 }
 
-#ifdef RADIO_CONTROL_TYPE_DATALINK
-static void on_DL_RC_3CH(IvyClientPtr app __attribute__((unused)),
-                         void *user_data __attribute__((unused)),
-                         int argc __attribute__((unused)), char *argv[]);
-
-static void on_DL_RC_4CH(IvyClientPtr app __attribute__((unused)),
-                         void *user_data __attribute__((unused)),
-                         int argc __attribute__((unused)), char *argv[]);
-#endif
-
-void nps_ivy_common_init(char *ivy_bus)
+void nps_ivy_init(char *ivy_bus)
 {
   const char *agent_name = AIRFRAME_NAME"_NPS";
   const char *ready_msg = AIRFRAME_NAME"_NPS Ready";

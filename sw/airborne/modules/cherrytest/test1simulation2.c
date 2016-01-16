@@ -51,7 +51,7 @@ int avoid_detection2()
   float own_pos_y = stateGetPositionEnu_f()->y;
   float own_speed_x = stateGetSpeedEnu_f()->x;
   float own_speed_y = stateGetSpeedEnu_f()->y;
-  float own_course_rad = *stateGetHorizontalSpeedDir_f();
+  float own_course_rad = stateGetHorizontalSpeedDir_f();
   float own_course_deg = (own_course_rad/M_PI)*180;
   float own_heading_rad = stateGetNedToBodyEulers_f()->psi;
   float own_heading_deg = (own_heading_rad/M_PI)*180;
