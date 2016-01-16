@@ -110,9 +110,14 @@ def get_min_max_guess(meas, scale):
     """Initial boundary based calibration."""
     max_meas = meas[:, :].max(axis=0)
     min_meas = meas[:, :].min(axis=0)
-    n = (max_meas + min_meas) / 2
-    sf = 2*scale/(max_meas - min_meas)
-    return np.array([n[0], n[1], n[2], sf[0], sf[1], sf[2]])
+    range = max_meas - min_meas
+    # check if we would get division by zero
+    if range.all():
+        n = (max_meas + min_meas) / 2
+        sf = 2*scale/range
+        return np.array([n[0], n[1], n[2], sf[0], sf[1], sf[2]])
+    else:
+        return np.array([0, 0, 0, 0])
 
 
 def scale_measurements(meas, p):
@@ -158,6 +163,13 @@ def print_imu_scaled(sensor, measurements, attrs):
     print("StDev " + str(measurements[:,1:].std(axis=0)*attrs[0])  + " " + attrs[1])
 
 
+def plot_measurements(sensor, measurements):
+    plt.plot(measurements[:, 0])
+    plt.plot(measurements[:, 1])
+    plt.plot(measurements[:, 2])
+    plt.ylabel('ADC')
+    plt.title("Raw %s measurements" % sensor)
+    plt.show()
 
 def plot_results(sensor, measurements, flt_idx, flt_meas, cp0, np0, cp1, np1, sensor_ref, blocking=True):
     """Plot calibration results."""

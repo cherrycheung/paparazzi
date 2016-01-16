@@ -110,6 +110,18 @@ else ifeq ($(BOARD), lisa_s)
   BARO_BOARD_SRCS += peripherals/ms5611_spi.c
   BARO_BOARD_SRCS += boards/baro_board_ms5611_spi.c
 
+# ELLE0 baro
+else ifeq ($(BOARD), elle0)
+
+# defaults to SPI baro MS5611 on the board
+  include $(CFG_SHARED)/spi_master.makefile
+  BARO_BOARD_CFLAGS += -DUSE_SPI1 -DUSE_SPI_SLAVE1
+  BARO_BOARD_CFLAGS += -DBB_MS5611_SPI_DEV=spi1
+  BARO_BOARD_CFLAGS += -DBB_MS5611_SLAVE_IDX=SPI_SLAVE1
+  BARO_BOARD_SRCS += peripherals/ms5611.c
+  BARO_BOARD_SRCS += peripherals/ms5611_spi.c
+  BARO_BOARD_SRCS += boards/baro_board_ms5611_spi.c
+
 # Lia baro (no bmp onboard)
 else ifeq ($(BOARD), lia)
 # fixme, reuse the baro drivers in lisa_m dir
@@ -176,6 +188,15 @@ else ifeq ($(BOARD), umarim)
     BARO_BOARD_SRCS += peripherals/ads1114.c
     BARO_BOARD_SRCS += boards/umarim/baro_board.c
   endif
+
+# Naze32
+else ifeq ($(BOARD), naze32)
+    BARO_BOARD_CFLAGS += -DBARO_BOARD=BARO_MS5611_I2C
+    BARO_BOARD_CFLAGS += -DUSE_I2C2
+    BARO_BOARD_CFLAGS += -DBB_MS5611_I2C_DEV=i2c2
+    BARO_BOARD_SRCS += peripherals/ms5611.c
+    BARO_BOARD_SRCS += peripherals/ms5611_i2c.c
+    BARO_BOARD_SRCS += boards/baro_board_ms5611_i2c.c
 
 endif # check board
 

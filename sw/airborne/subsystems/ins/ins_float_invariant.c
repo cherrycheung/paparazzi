@@ -48,7 +48,7 @@
 #include "state.h"
 
 // for debugging
-#if SEND_INVARIANT_FILTER
+#if SEND_INVARIANT_FILTER || PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
 #endif
 
@@ -186,6 +186,33 @@ static inline void init_invariant_state(void)
   ins_gps_fix_once = FALSE;
 }
 
+#if SEND_INVARIANT_FILTER || PERIODIC_TELEMETRY
+static void send_inv_filter(struct transport_tx *trans, struct link_device *dev)
+{
+  struct FloatEulers eulers;
+  FLOAT_EULERS_OF_QUAT(eulers, ins_float_inv.state.quat);
+  pprz_msg_send_INV_FILTER(trans, dev,
+      AC_ID,
+      &ins_float_inv.state.quat.qi,
+      &eulers.phi,
+      &eulers.theta,
+      &eulers.psi,
+      &ins_float_inv.state.speed.x,
+      &ins_float_inv.state.speed.y,
+      &ins_float_inv.state.speed.z,
+      &ins_float_inv.state.pos.x,
+      &ins_float_inv.state.pos.y,
+      &ins_float_inv.state.pos.z,
+      &ins_float_inv.state.bias.p,
+      &ins_float_inv.state.bias.q,
+      &ins_float_inv.state.bias.r,
+      &ins_float_inv.state.as,
+      &ins_float_inv.state.hb,
+      &ins_float_inv.meas.baro_alt,
+      &ins_float_inv.meas.pos_gps.z);
+}
+#endif
+
 void ins_float_invariant_init(void)
 {
 
@@ -236,26 +263,19 @@ void ins_float_invariant_init(void)
 
   ins_float_inv.is_aligned = FALSE;
   ins_float_inv.reset = FALSE;
+
+#if PERIODIC_TELEMETRY
+  register_periodic_telemetry(DefaultPeriodic, PPRZ_MSG_ID_INV_FILTER, send_inv_filter);
+#endif
 }
 
 
 void ins_reset_local_origin(void)
 {
 #if INS_FINV_USE_UTM
-  struct UtmCoor_f utm;
-#ifdef GPS_USE_LATLONG
-  /* Recompute UTM coordinates in this zone */
-  struct LlaCoor_f lla;
-  LLA_FLOAT_OF_BFP(lla, gps.lla_pos);
-  utm.zone = (gps.lla_pos.lon / 1e7 + 180) / 6 + 1;
-  utm_of_lla_f(&utm, &lla);
-#else
-  utm.zone = gps.utm_pos.zone;
-  utm.east = gps.utm_pos.east / 100.0f;
-  utm.north = gps.utm_pos.north / 100.0f;
-#endif
+  struct UtmCoor_f utm = utm_float_from_gps(&gps, 0);
   // ground_alt
-  utm.alt = gps.hmsl / 1000.0f;
+  utm.alt = gps.hmsl  / 1000.0f;
   // reset state UTM ref
   stateSetLocalUtmOrigin_f(&utm);
 #else
@@ -285,17 +305,15 @@ void ins_reset_altitude_ref(void)
 #endif
 }
 
-void ins_float_invariant_align(struct Int32Rates *lp_gyro,
-                               struct Int32Vect3 *lp_accel,
-                               struct Int32Vect3 *lp_mag)
+void ins_float_invariant_align(struct FloatRates *lp_gyro,
+                               struct FloatVect3 *lp_accel,
+                               struct FloatVect3 *lp_mag)
 {
   /* Compute an initial orientation from accel and mag directly as quaternion */
   ahrs_float_get_quat_from_accel_mag(&ins_float_inv.state.quat, lp_accel, lp_mag);
 
   /* use average gyro as initial value for bias */
-  struct FloatRates bias0;
-  RATES_COPY(bias0, *lp_gyro);
-  RATES_FLOAT_OF_BFP(ins_float_inv.state.bias, bias0);
+  ins_float_inv.state.bias = *lp_gyro;
 
   /* push initial values to state interface */
   stateSetNedToBodyQuat_f(&ins_float_inv.state.quat);
@@ -304,7 +322,7 @@ void ins_float_invariant_align(struct Int32Rates *lp_gyro,
   ins_float_inv.is_aligned = TRUE;
 }
 
-void ins_float_invariant_propagate(struct Int32Rates* gyro, struct Int32Vect3* accel, float dt)
+void ins_float_invariant_propagate(struct FloatRates* gyro, struct FloatVect3* accel, float dt)
 {
   struct FloatRates body_rates;
 
@@ -316,14 +334,10 @@ void ins_float_invariant_propagate(struct Int32Rates* gyro, struct Int32Vect3* a
     init_invariant_state();
   }
 
-  // fill command vector
-  struct Int32Rates gyro_meas_body;
-  struct Int32RMat *body_to_imu_rmat = orientationGetRMat_i(&ins_float_inv.body_to_imu);
-  int32_rmat_transp_ratemult(&gyro_meas_body, body_to_imu_rmat, gyro);
-  RATES_FLOAT_OF_BFP(ins_float_inv.cmd.rates, gyro_meas_body);
-  struct Int32Vect3 accel_meas_body;
-  int32_rmat_transp_vmult(&accel_meas_body, body_to_imu_rmat, accel);
-  ACCELS_FLOAT_OF_BFP(ins_float_inv.cmd.accel, accel_meas_body);
+  // fill command vector in body frame
+  struct FloatRMat *body_to_imu_rmat = orientationGetRMat_f(&ins_float_inv.body_to_imu);
+  float_rmat_transp_ratemult(&ins_float_inv.cmd.rates, body_to_imu_rmat, gyro);
+  float_rmat_transp_vmult(&ins_float_inv.cmd.accel, body_to_imu_rmat, accel);
 
   // update correction gains
   error_output(&ins_float_inv);
@@ -357,29 +371,7 @@ void ins_float_invariant_propagate(struct Int32Rates* gyro, struct Int32Vect3* a
   //------------------------------------------------------------//
 
 #if SEND_INVARIANT_FILTER
-  struct FloatEulers eulers;
-  FLOAT_EULERS_OF_QUAT(eulers, ins_float_inv.state.quat);
-  RunOnceEvery(3,
-               pprz_msg_send_INV_FILTER(&(DefaultChannel).trans_tx, &(DefaultDevice).device,
-                                        AC_ID,
-                                        &ins_float_inv.state.quat.qi,
-                                        &eulers.phi,
-                                        &eulers.theta,
-                                        &eulers.psi,
-                                        &ins_float_inv.state.speed.x,
-                                        &ins_float_inv.state.speed.y,
-                                        &ins_float_inv.state.speed.z,
-                                        &ins_float_inv.state.pos.x,
-                                        &ins_float_inv.state.pos.y,
-                                        &ins_float_inv.state.pos.z,
-                                        &ins_float_inv.state.bias.p,
-                                        &ins_float_inv.state.bias.q,
-                                        &ins_float_inv.state.bias.r,
-                                        &ins_float_inv.state.as,
-                                        &ins_float_inv.state.hb,
-                                        &ins_float_inv.meas.baro_alt,
-                                        &ins_float_inv.meas.pos_gps.z);
-               );
+  RunOnceEvery(3, send_inv_filter(&(DefaultChannel).trans_tx, &(DefaultDevice).device));
 #endif
 
 #if LOG_INVARIANT_FILTER
@@ -431,14 +423,15 @@ void ins_float_invariant_propagate(struct Int32Rates* gyro, struct Int32Vect3* a
 void ins_float_invariant_update_gps(struct GpsState *gps_s)
 {
 
-  if (gps_s->fix == GPS_FIX_3D && ins_float_inv.is_aligned) {
+  if (gps_s->fix >= GPS_FIX_3D && ins_float_inv.is_aligned) {
     ins_gps_fix_once = TRUE;
 
 #if INS_FINV_USE_UTM
     if (state.utm_initialized_f) {
+      struct UtmCoor_f utm = utm_float_from_gps(gps_s, nav_utm_zone0);
       // position (local ned)
-      ins_float_inv.meas.pos_gps.x = (gps_s->utm_pos.north / 100.0f) - state.utm_origin_f.north;
-      ins_float_inv.meas.pos_gps.y = (gps_s->utm_pos.east / 100.0f) - state.utm_origin_f.east;
+      ins_float_inv.meas.pos_gps.x = utm.north - state.utm_origin_f.north;
+      ins_float_inv.meas.pos_gps.y = utm.east - state.utm_origin_f.east;
       ins_float_inv.meas.pos_gps.z = state.utm_origin_f.alt - (gps_s->hmsl / 1000.0f);
       // speed
       ins_float_inv.meas.speed_gps.x = gps_s->ned_vel.x / 100.0f;
@@ -495,7 +488,7 @@ void ins_float_invariant_update_baro(float pressure)
 // assume mag is dead when values are not moving anymore
 #define MAG_FROZEN_COUNT 30
 
-void ins_float_invariant_update_mag(struct Int32Vect3* mag)
+void ins_float_invariant_update_mag(struct FloatVect3* mag)
 {
   static uint32_t mag_frozen_count = MAG_FROZEN_COUNT;
   static int32_t last_mx = 0;
@@ -509,11 +502,9 @@ void ins_float_invariant_update_mag(struct Int32Vect3* mag)
     }
   } else {
     // values are moving
-    struct Int32RMat *body_to_imu_rmat = orientationGetRMat_i(&ins_float_inv.body_to_imu);
-    struct Int32Vect3 mag_meas_body;
+    struct FloatRMat *body_to_imu_rmat = orientationGetRMat_f(&ins_float_inv.body_to_imu);
     // new values in body frame
-    int32_rmat_transp_vmult(&mag_meas_body, body_to_imu_rmat, mag);
-    MAGS_FLOAT_OF_BFP(ins_float_inv.meas.mag, mag_meas_body);
+    float_rmat_transp_vmult(&ins_float_inv.meas.mag, body_to_imu_rmat, mag);
     // reset counter
     mag_frozen_count = MAG_FROZEN_COUNT;
   }
@@ -615,7 +606,7 @@ static inline void error_output(struct InsFloatInv *_ins)
 
   // pos and speed error only if GPS data are valid
   // or while waiting first GPS data to prevent diverging
-  if ((gps.fix == GPS_FIX_3D && ins_float_inv.is_aligned
+  if ((gps.fix >= GPS_FIX_3D && ins_float_inv.is_aligned
 #if INS_FINV_USE_UTM
        && state.utm_initialized_f
 #else

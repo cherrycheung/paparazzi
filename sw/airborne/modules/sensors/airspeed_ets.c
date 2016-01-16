@@ -83,6 +83,13 @@ PRINT_CONFIG_VAR(AIRSPEED_ETS_I2C_DEV)
 #endif
 PRINT_CONFIG_VAR(AIRSPEED_ETS_START_DELAY)
 
+#if AIRSPEED_ETS_SDLOG
+#include "sdLog.h"
+#include "subsystems/chibios-libopencm3/chibios_sdlog.h"
+#include "subsystems/gps.h"
+bool_t log_airspeed_ets_started;
+#endif
+
 
 // Global variables
 uint16_t airspeed_ets_raw;
@@ -123,6 +130,10 @@ void airspeed_ets_init(void)
 
   airspeed_ets_delay_done = FALSE;
   SysTimeTimerStart(airspeed_ets_delay_time);
+
+#if AIRSPEED_ETS_SDLOG
+  log_airspeed_ets_started = FALSE;
+#endif
 }
 
 void airspeed_ets_read_periodic(void)
@@ -137,7 +148,7 @@ void airspeed_ets_read_periodic(void)
   }
 #elif !defined USE_NPS
   extern float sim_air_speed;
-  stateSetAirspeed_f(&sim_air_speed);
+  stateSetAirspeed_f(sim_air_speed);
 #endif //SITL
 }
 
@@ -212,7 +223,7 @@ void airspeed_ets_read_event(void)
     }
     airspeed_ets = airspeed_ets / (float)AIRSPEED_ETS_NBSAMPLES_AVRG;
 #if USE_AIRSPEED_ETS
-    stateSetAirspeed_f(&airspeed_ets);
+    stateSetAirspeed_f(airspeed_ets);
 #endif
 #if AIRSPEED_ETS_SYNC_SEND
     DOWNLINK_SEND_AIRSPEED_ETS(DefaultChannel, DefaultDevice, &airspeed_ets_raw, &airspeed_ets_offset, &airspeed_ets);
@@ -220,6 +231,23 @@ void airspeed_ets_read_event(void)
   } else {
     airspeed_ets = 0.0;
   }
+
+
+#if AIRSPEED_ETS_SDLOG
+  if (pprzLogFile != -1) {
+    if (!log_airspeed_ets_started) {
+      sdLogWriteLog(pprzLogFile, "AIRSPEED_ETS: raw offset airspeed(m/s) GPS_fix TOW(ms) Week Lat(1e7rad) Lon(1e7rad) HMSL(mm) gpseed(cm/s) course(1e7rad) climb(cm/s)\n");
+      log_airspeed_ets_started = TRUE;
+    }
+    sdLogWriteLog(pprzLogFile, "airspeed_ets: %d %d %8.4f   %d %d %d   %d %d %d   %d %d %d\n",
+		  airspeed_ets_raw, airspeed_ets_offset, airspeed_ets,
+		  gps.fix, gps.tow, gps.week,
+		  gps.lla_pos.lat, gps.lla_pos.lon, gps.hmsl,
+		  gps.gspeed, gps.course, -gps.ned_vel.z);
+  }
+#endif
+
+
 
   // Transaction has been read
   airspeed_ets_i2c_trans.status = I2CTransDone;
