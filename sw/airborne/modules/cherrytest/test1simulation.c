@@ -25,6 +25,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include "cherrytest/test1simulation.h"
+
+//struct aTest Test;
+
 #include "state.h"
 #include "generated/airframe.h" /* to include the AC_ID */
 #include "subsystems/datalink/datalink.h"
@@ -55,6 +58,7 @@ int avoid_detection1()
   float own_course_deg = (own_course_rad/M_PI)*180;
   float own_heading_rad = stateGetNedToBodyEulers_f()->psi;
   float own_heading_deg = (own_heading_rad/M_PI)*180;
+  //Test.own_heading_deg = (own_heading_rad/M_PI)*180;
 
   // INTRUDER coordinates
   int ac_id2 = 207;
@@ -83,7 +87,7 @@ int avoid_detection1()
 
   /* Avoidance data */
   float rpz = 0.5;
-  d_avo = 1.75;
+  d_avo = 1.85;
   float d_oi = sqrt(powf((own_pos_x - int_pos_x),2) + powf((own_pos_y - int_pos_y),2));
 
   // YAZDI'S EQUATIONS
@@ -101,7 +105,7 @@ int avoid_detection1()
   (sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
   float avoid_angle = acos(BB);
 
-  printf("drone1: %f  %f  %f  %f  \n",avoid_angle,alpha_vo,AA,AAA);
+  printf("drone1: %f %f  %f  %f  %f  \n",own_heading_deg,avoid_angle,alpha_vo,AA,AAA);
 
   if (d_oi > rpz){
     if (own_heading_deg > (angle_global - 70) &&  own_heading_deg < (angle_global + 70)){
@@ -136,8 +140,8 @@ int avoid_navigation1(uint8_t wpb,float angle_avoid){
   angle_avoidance = own_heading + angle_avoid;
   float angle_avoidance_rad = angle_avoidance/180*M_PI;
 
-  float x_inc = d_avo*1.1 * sin(angle_avoidance_rad);
-  float y_inc = d_avo*1.1 * cos(angle_avoidance_rad);
+  float x_inc = d_avo*1.2 * sin(angle_avoidance_rad);
+  float y_inc = d_avo*1.2 * cos(angle_avoidance_rad);
 
   NavCherry(wpb,x_inc,y_inc);
   nav_set_heading_towards(x_inc + stateGetPositionEnu_f()->x, y_inc + stateGetPositionEnu_f()->y);

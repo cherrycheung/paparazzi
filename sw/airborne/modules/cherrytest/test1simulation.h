@@ -38,6 +38,16 @@
 #include "subsystems/datalink/downlink.h"
 #include "firmwares/rotorcraft/navigation.h"
 
+/*#ifndef TEST_H__
+#define TEST_H__
+
+struct aTest {
+  float own_heading_deg;
+};
+extern struct aTest Test;
+
+#endif*/
+
 extern int avoid_detection1(void);
 float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery);
 float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
