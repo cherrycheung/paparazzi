@@ -43,6 +43,7 @@
 
 struct aTest {
   float own_heading_deg;
+  float angle_azimuth;
 };
 extern struct aTest Test;
 
@@ -52,7 +53,7 @@ extern int avoid_detection1(void);
 float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery);
 float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
 extern int avoid_navigation1(uint8_t wpb,float angle_avoid);
-extern int safe_setting1();
+extern int safe_setting1(void);
 
 extern int valueofdetection1;
 extern int valueofnavigation1;

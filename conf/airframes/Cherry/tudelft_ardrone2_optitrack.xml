@@ -7,6 +7,8 @@
       <subsystem name="fdm" type="jsbsim"/>
     </target>
     <target name="ap" board="ardrone2">
+      <!--configure name="HOST" value="192.168.209.$(AC_ID)"/>
+      <configure name="MODEM_HOST" value="192.168.209.13"/-->
       <configure name="USE_BARO_BOARD" value="FALSE"/>
     </target>
     <define name="FAILSAFE_DESCENT_SPEED" value="0.5"/>

@@ -48,7 +48,7 @@ extern uint8_t the_acs_id[NB_ACS_ID];
 extern struct ac_info_ the_acs[NB_ACS];
 
 #define MOfCm(X) (((float)(X)/100.0f))
-/*
+
 #define ParseACINFO() { 							\
   printf("testing acinfo\n"); 							\
       if (DL_ACINFO_ac_id(dl_buffer) != AC_ID) {  				\
@@ -62,8 +62,9 @@ extern struct ac_info_ the_acs[NB_ACS];
 	uint8_t id = DL_ACINFO_ac_id(dl_buffer); 				\
 	SetAcInfo(id, ux, uy, c, a, s, cl, t); 				\
     } 										\
-} ONLY USE IT WHEN IN CYBERZOO!!! */
-
+} 
+//ONLY USE IT WHEN IN CYBERZOO!!!
+ 
 // 0 is reserved for ground station (id=0)
 // 1 is reserved for this AC (id=AC_ID)
 // the part here above only works for experiments in the Cyber Zoo

@@ -25,9 +25,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include "cherrytest/test1simulation.h"
-
-//struct aTest Test;
-
 #include "state.h"
 #include "generated/airframe.h" /* to include the AC_ID */
 #include "subsystems/datalink/datalink.h"
@@ -40,6 +37,8 @@
 #include "generated/flight_plan.h"  //needed to use WP_HOME
 #include "subsystems/ins.h"
 #include "math/pprz_geodetic_float.h"
+
+//struct aTest Test;
 
 int valueofdetection1 = 0;
 int valueofnavigation1 = 0;
@@ -84,10 +83,11 @@ int avoid_detection1()
 
   float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y);
   float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
+  //Test.angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
 
   /* Avoidance data */
   float rpz = 0.5;
-  d_avo = 1.85;
+  d_avo = 1.9;
   float d_oi = sqrt(powf((own_pos_x - int_pos_x),2) + powf((own_pos_y - int_pos_y),2));
 
   // YAZDI'S EQUATIONS
@@ -100,14 +100,19 @@ int avoid_detection1()
   DD_vo[1] = d_vo * sin(angle_azimuth); /** cos(theta_vo);*/
   float AA = (own_speed_x-int_speed_x)*DD_vo[0]+(own_speed_y-int_speed_y)*DD_vo[1];
   float AAA = sqrt(powf((own_speed_x-int_speed_x),2)+powf((own_speed_y-int_speed_y),2))*d_vo;
+  //float AAA2 = sqrt(own_speed_x*own_speed_x+own_speed_y*own_speed_y)*d_vo;
   float BB = AA/AAA;
 
-  (sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
+  float own_speed = sqrt(powf((own_speed_x),2)+powf((own_speed_y),2));
+
+  //(sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
   float avoid_angle = acos(BB);
 
-  printf("drone1: %f %f  %f  %f  %f  \n",own_heading_deg,avoid_angle,alpha_vo,AA,AAA);
+  printf("drone1: %f %f  %f  %f  %f %f %f\n",BB, AA, AAA, avoid_angle,alpha_vo, own_speed,angle_azimuth);
+  //printf("drone1: %f %f  %f  %f %f  %f\n",own_speed_x,own_speed_y,int_speed_x,int_speed_y,AA,AAA);
 
   if (d_oi > rpz){
+    //if (own_speed > 0.15 ){//&& own_speed_x > 0.05 && own_speed_y > 0.05){
     if (own_heading_deg > (angle_global - 70) &&  own_heading_deg < (angle_global + 70)){
       if (d_oi < d_avo){
           if (avoid_angle < alpha_vo && BB > 0){
@@ -129,10 +134,13 @@ int avoid_detection1()
       }
     }
     //printf(" \n");
+  //}
   }
+
 
   return(0);
   //printf(" \n");
+
 }
 
 int avoid_navigation1(uint8_t wpb,float angle_avoid){
