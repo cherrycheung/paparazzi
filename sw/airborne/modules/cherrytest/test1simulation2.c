@@ -20,31 +20,33 @@
  *
  */
 
- #include <stdio.h>
- #include <std.h>
- #include <stdlib.h>
- #include <time.h>
- #include "cherrytest/test1simulation.h"
- #include "state.h"
- #include "generated/airframe.h" /* to include the AC_ID */
- #include "subsystems/datalink/datalink.h"
- #include "math.h"
- #include "subsystems/navigation/traffic_info.h"
- #include "subsystems/gps.h"
- #include "messages.h"
- #include "subsystems/datalink/downlink.h"
- #include "navigation.h"
- #include "generated/flight_plan.h"  //needed to use WP_HOME
- #include "subsystems/ins.h"
- #include "math/pprz_geodetic_float.h"
+#include <stdio.h>
+#include <std.h>
+#include <stdlib.h>
+#include <time.h>
+#include "cherrytest/test1simulation.h"
+#include "state.h"
+#include "generated/airframe.h" /* to include the AC_ID */
+#include "subsystems/datalink/datalink.h"
+#include "math.h"
+#include "subsystems/navigation/traffic_info.h"
+#include "subsystems/gps.h"
+#include "messages.h"
+#include "subsystems/datalink/downlink.h"
+#include "navigation.h"
+#include "generated/flight_plan.h"  //needed to use WP_HOME
+#include "subsystems/ins.h"
+#include "math/pprz_geodetic_float.h"
 
-int valueofdetection2 = 0;
-int valueofnavigation2 = 0;
-float azimuth2 = 0;
-float own_heading2 = 0;
-float d_avo2 = 0;
+//struct aTest Test;
 
-int avoid_detection2()
+int valueofdetection1 = 0;
+int valueofnavigation1 = 0;
+float azimuth = 0;
+float own_heading = 0;
+float d_avo = 0;
+
+int avoid_detection1()
 {
   // OWN coordinates
   float own_pos_x = stateGetPositionEnu_f()->x;
@@ -55,6 +57,7 @@ int avoid_detection2()
   float own_course_deg = (own_course_rad/M_PI)*180;
   float own_heading_rad = stateGetNedToBodyEulers_f()->psi;
   float own_heading_deg = (own_heading_rad/M_PI)*180;
+  //Test.own_heading_deg = (own_heading_rad/M_PI)*180;
 
   // INTRUDER coordinates
   int ac_id2 = 201;
@@ -78,77 +81,104 @@ int avoid_detection2()
   float int_speed_x = cos((intruder.course)*-1 + 0.5*M_PI)*intruder.gspeed;
   float int_speed_y = sin((intruder.course)*-1 + 0.5*M_PI)*intruder.gspeed;
 
-  float angle_global = calcGlobalAngle2(own_pos_x, own_pos_y, int_pos_x, int_pos_y);
-  float angle_azimuth = calcAzimuthAngle2(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
+  float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y);
+  float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
+  //float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_course_deg);
+  //Test.angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
 
   /* Avoidance data */
   float rpz = 0.5;
-  d_avo2 = 1.75;
-  float d_oi = sqrt((own_pos_x - int_pos_x)*(own_pos_x - int_pos_x) + (own_pos_y - int_pos_y)*(own_pos_y - int_pos_y));
+  d_avo = 1.8;
+  float d_oi = sqrt(powf((own_pos_x - int_pos_x),2) + powf((own_pos_y - int_pos_y),2));
 
   // YAZDI'S EQUATIONS
   float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
   float r_vo = rpz*((sqrt(d_oi*d_oi - rpz*rpz))/d_oi);
   float alpha_vo = atan(r_vo/d_vo);
-  /* float theta_vo = 0.00; */
+
   float DD_vo[2];
-  DD_vo[0] = d_vo * cos(angle_azimuth); /** cos(theta_vo);*/
-  DD_vo[1] = d_vo * sin(angle_azimuth); /** cos(theta_vo);*/
-  float BB = ((own_speed_x - int_speed_x) * DD_vo[0] + (own_speed_y - int_speed_y) * DD_vo[1])/(sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
+  DD_vo[0] = d_vo * cos(abs(angle_azimuth)); /** cos(theta_vo);*/
+  DD_vo[1] = d_vo * sin(abs(angle_azimuth)); /** cos(theta_vo);*/
+  float AA = (own_speed_x-int_speed_x)*DD_vo[0]+(own_speed_y-int_speed_y)*DD_vo[1];
+  float AAA = sqrt(powf((own_speed_x-int_speed_x),2)+powf((own_speed_y-int_speed_y),2))*d_vo;
+  float BB = AA/AAA;
+  float own_speed = sqrt(powf((own_speed_x),2)+powf((own_speed_y),2));
   float avoid_angle = acos(BB);
 
-  printf("drone2: %f  %f  %f  %f  \n",r_vo,avoid_angle,alpha_vo,BB);
+  //printf("drone1: BB %f Vo %f %f  %f  %f %f %f\n",BB, AA, AAA, avoid_angle,alpha_vo, own_speed,angle_azimuth);
+  //printf("drone1: %f %f  %f  %f %f  %f\n",own_speed_x,own_speed_y,int_speed_x,int_speed_y,AA,AAA);
+  //printf("drone1: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n", own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
+  //printf("drone1: cc %f dd %f angle %f alpha %f\n", cc, dd, avoid_angle2/M_PI*180,alpha_vo/M_PI*180);
 
-  if (d_oi > rpz){
-    if (own_heading_deg > (angle_global - 90) &&  own_heading_deg < (angle_global + 90)){
-      if (d_oi < d_avo2){
-          if (avoid_angle < alpha_vo && BB > 0){
-            valueofdetection2 = 1;
-            printf("  avoid mode \n");
-            azimuth2 = angle_azimuth;
-            own_heading2 = own_heading_deg;
-            return(1);
-          }
-          else if(avoid_angle < alpha_vo && BB < 0){
-            //printf("  maintain mode 1");
-          }
-          else if(avoid_angle > alpha_vo && BB > 0){
-            //printf("  maintain mode 2");
-          }
-          else if(avoid_angle > alpha_vo && BB < 0){
-            //printf("  maintain mode 3");
-          }
-      }
-    }
-    //printf(" \n");
+  // Right of way
+  float row_angle = int_heading_deg - own_heading_deg;
+//  float row_angle = int_heading_deg - own_course_deg;
+  int row_zone;
+  if (row_angle >= -45 && row_angle <= 45){
+    row_zone = 1;
+  }
+  else if(row_angle > 45 && row_angle < 136){
+    row_zone = 2;
+  }
+  else if(row_angle >= 136 && row_angle <= 180){
+    row_zone = 3;
+  }
+  else if(row_angle >= -180 && row_angle <= -136){
+    row_zone = 3;
+  }
+  else if(row_angle >= -135 && row_angle <= -46){
+    row_zone = 4;
   }
 
+
+
+  if (d_oi > rpz){
+    if (own_speed > 0.1){
+      if (own_heading_deg > (angle_global - 70) &&  own_heading_deg < (angle_global + 70)){
+        if (avoid_angle < alpha_vo && BB > 0){
+          if (d_oi < d_avo){
+            if (row_zone == 1 || row_zone == 3 || row_zone == 4){
+              valueofdetection1 = 1;
+              printf("avoid mode \n");
+              azimuth = angle_azimuth;
+              own_heading = own_heading_deg;
+              return(1);
+            }
+            else {
+              printf("drone 1: has the right of way\n");
+            }
+          }
+          else{
+            printf("collide soon\n");
+          }
+        }
+      }
+    }
+  }
   return(0);
-  //printf(" \n");
 }
 
-int avoid_navigation2(uint8_t wpb,float angle_avoid){
+int avoid_navigation1(uint8_t wpb,float angle_avoid){
   float angle_avoidance;
-  angle_avoidance = own_heading2 + angle_avoid;
+  angle_avoidance = own_heading + angle_avoid;
   float angle_avoidance_rad = angle_avoidance/180*M_PI;
 
-  float x_inc = 1.75 * sin(angle_avoidance_rad);
-  float y_inc = 1.75 * cos(angle_avoidance_rad);
+  float x_inc = d_avo*1.2 * sin(angle_avoidance_rad);
+  float y_inc = d_avo*1.2 * cos(angle_avoidance_rad);
 
-printf("%f %f %f %f",stateGetPositionEnu_f()->x,stateGetPositionEnu_f()->y,x_inc + stateGetPositionEnu_f()->x, y_inc + stateGetPositionEnu_f()->y);
   NavCherry(wpb,x_inc,y_inc);
   nav_set_heading_towards(x_inc + stateGetPositionEnu_f()->x, y_inc + stateGetPositionEnu_f()->y);
   NavGotoWaypoint(wpb);
   return 0;
 }
 
-int safe_setting2(){
-  valueofdetection2 = 0;
-  printf("Value of detection 2 has been resetted\n");
+int safe_setting1(){
+  valueofdetection1 = 0;
+  printf("Value of detection has been resetted\n");
 return 0;
 }
 
-float calcGlobalAngle2(float ownshipx, float ownshipy, float intruderx, float intrudery){
+float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery){
   float global_angle1;
   if(intrudery > ownshipy){
     if(intruderx == ownshipx){
@@ -186,7 +216,7 @@ float calcGlobalAngle2(float ownshipx, float ownshipy, float intruderx, float in
     return(global_angle1);
 }
 
-float calcAzimuthAngle2(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship){
+float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship){
   float global_angle1;
   float azimuth_angle;
   if(intrudery > ownshipy){

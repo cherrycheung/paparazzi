@@ -20,32 +20,42 @@
  *
  */
 
-/** \file test1simulation2.h
+/** \file test1simulation.h
  *  \brief testing testing testing!
  */
 
- #include "std.h"
- #include "math/pprz_geodetic_int.h"
+#include "std.h"
+#include "math/pprz_geodetic_int.h"
 
- #include "subsystems/navigation/common_flight_plan.h"
- #include "subsystems/navigation/traffic_info.h"
- #include "messages.h"
- #include "dl_protocol.h"
- #include <stdio.h>
- #include "subsystems/datalink/datalink.h"
- #include "subsystems/gps.h"
- #include "messages.h"
- #include "subsystems/datalink/downlink.h"
- #include "firmwares/rotorcraft/navigation.h"
+#include "subsystems/navigation/common_flight_plan.h"
+#include "subsystems/navigation/traffic_info.h"
+#include "messages.h"
+#include "dl_protocol.h"
+#include <stdio.h>
+#include "subsystems/datalink/datalink.h"
+#include "subsystems/gps.h"
+#include "messages.h"
+#include "subsystems/datalink/downlink.h"
+#include "firmwares/rotorcraft/navigation.h"
 
+/*#ifndef TEST_H__
+#define TEST_H__
 
-extern int avoid_detection2(void);
-float calcGlobalAngle2(float ownshipx, float ownshipy, float intruderx, float intrudery);
-float calcAzimuthAngle2(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
-extern int avoid_navigation2(uint8_t wpb,float angle_avoid);
-extern int safe_warning2();
+struct aTest {
+  float own_heading_deg;
+  float angle_azimuth;
+};
+extern struct aTest Test;
 
-extern int valueofdetection2;
-extern int valueofnavigation2;
-extern float angle_azimuth2;
-extern float own_heading_deg2;
+#endif*/
+
+extern int avoid_detection1(void);
+float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery);
+float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
+extern int avoid_navigation1(uint8_t wpb,float angle_avoid);
+extern int safe_setting1(void);
+
+extern int valueofdetection1;
+extern int valueofnavigation1;
+extern float angle_azimuth;
+extern float own_heading_deg;

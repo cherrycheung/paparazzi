@@ -83,64 +83,79 @@ int avoid_detection1()
 
   float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y);
   float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
+  //float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_course_deg);
   //Test.angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
 
   /* Avoidance data */
   float rpz = 0.5;
-  d_avo = 1.9;
+  d_avo = 1.8;
   float d_oi = sqrt(powf((own_pos_x - int_pos_x),2) + powf((own_pos_y - int_pos_y),2));
 
   // YAZDI'S EQUATIONS
   float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
   float r_vo = rpz*((sqrt(d_oi*d_oi - rpz*rpz))/d_oi);
   float alpha_vo = atan(r_vo/d_vo);
-  /* float theta_vo = 0.00; */
+
   float DD_vo[2];
-  DD_vo[0] = d_vo * cos(angle_azimuth); /** cos(theta_vo);*/
-  DD_vo[1] = d_vo * sin(angle_azimuth); /** cos(theta_vo);*/
+  DD_vo[0] = d_vo * cos(abs(angle_azimuth)); /** cos(theta_vo);*/
+  DD_vo[1] = d_vo * sin(abs(angle_azimuth)); /** cos(theta_vo);*/
   float AA = (own_speed_x-int_speed_x)*DD_vo[0]+(own_speed_y-int_speed_y)*DD_vo[1];
   float AAA = sqrt(powf((own_speed_x-int_speed_x),2)+powf((own_speed_y-int_speed_y),2))*d_vo;
-  //float AAA2 = sqrt(own_speed_x*own_speed_x+own_speed_y*own_speed_y)*d_vo;
   float BB = AA/AAA;
-
   float own_speed = sqrt(powf((own_speed_x),2)+powf((own_speed_y),2));
-
-  //(sqrt((own_speed_x - int_speed_x)*(own_speed_x - int_speed_x) + (own_speed_y - int_speed_y)*(own_speed_y - int_speed_y)) *d_vo);
   float avoid_angle = acos(BB);
 
-  printf("drone1: %f %f  %f  %f  %f %f %f\n",BB, AA, AAA, avoid_angle,alpha_vo, own_speed,angle_azimuth);
+  //printf("drone1: BB %f Vo %f %f  %f  %f %f %f\n",BB, AA, AAA, avoid_angle,alpha_vo, own_speed,angle_azimuth);
   //printf("drone1: %f %f  %f  %f %f  %f\n",own_speed_x,own_speed_y,int_speed_x,int_speed_y,AA,AAA);
+  //printf("drone1: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n", own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
+  //printf("drone1: cc %f dd %f angle %f alpha %f\n", cc, dd, avoid_angle2/M_PI*180,alpha_vo/M_PI*180);
 
-  if (d_oi > rpz){
-    //if (own_speed > 0.15 ){//&& own_speed_x > 0.05 && own_speed_y > 0.05){
-    if (own_heading_deg > (angle_global - 70) &&  own_heading_deg < (angle_global + 70)){
-      if (d_oi < d_avo){
-          if (avoid_angle < alpha_vo && BB > 0){
-            valueofdetection1 = 1;
-            printf("  avoid mode \n");
-            azimuth = angle_azimuth;
-            own_heading = own_heading_deg;
-            return(1);
-          }
-          else if(avoid_angle < alpha_vo && BB < 0){
-            //printf("  maintain mode 1");
-          }
-          else if(avoid_angle > alpha_vo && BB > 0){
-            //printf("  maintain mode 2");
-          }
-          else if(avoid_angle > alpha_vo && BB < 0){
-            //printf("  maintain mode 3");
-          }
-      }
-    }
-    //printf(" \n");
-  //}
+  // Right of way
+  float row_angle = int_heading_deg - own_heading_deg;
+//  float row_angle = int_heading_deg - own_course_deg;
+  int row_zone;
+  if (row_angle >= -45 && row_angle <= 45){
+    row_zone = 1;
+  }
+  else if(row_angle > 45 && row_angle < 136){
+    row_zone = 2;
+  }
+  else if(row_angle >= 136 && row_angle <= 180){
+    row_zone = 3;
+  }
+  else if(row_angle >= -180 && row_angle <= -136){
+    row_zone = 3;
+  }
+  else if(row_angle >= -135 && row_angle <= -46){
+    row_zone = 4;
   }
 
 
-  return(0);
-  //printf(" \n");
 
+  if (d_oi > rpz){
+    if (own_speed > 0.1){
+      if (own_heading_deg > (angle_global - 70) &&  own_heading_deg < (angle_global + 70)){
+        if (avoid_angle < alpha_vo && BB > 0){
+          if (d_oi < d_avo){
+            if (row_zone == 1 || row_zone == 3 || row_zone == 4){
+              valueofdetection1 = 1;
+              printf("avoid mode \n");
+              azimuth = angle_azimuth;
+              own_heading = own_heading_deg;
+              return(1);
+            }
+            else {
+              printf("drone 1: has the right of way\n");
+            }
+          }
+          else{
+            printf("collide soon\n");
+          }
+        }
+      }
+    }
+  }
+  return(0);
 }
 
 int avoid_navigation1(uint8_t wpb,float angle_avoid){
@@ -319,14 +334,3 @@ float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float i
        }
        return(azimuth_angle);
 }
-
-	  /*
-	  float zones[4][2];
-	  zones[0][0] = -45;
-	  zones[0][1] =  45;
-	  zones[1][0] = zones[0][1];
-	  zones[1][1] = zones[1][0] + 90;
-	  zones[2][0] = zones[1][1];
-	  zones[2][1] = zones[1][1] * -1;
-	  zones[3][0] = zones[2][1];
-	  zones[3][1] = zones[0][0];*/

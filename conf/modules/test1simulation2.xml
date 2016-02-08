@@ -12,7 +12,7 @@
   <header>
     <file name="test1simulation2.h"/>
   </header>
-  <periodic fun="avoid_detection2()" freq="2." autorun="FALSE"/>
+  <periodic fun="avoid_detection1()" freq="2." autorun="FALSE"/>
   <!--datalink message="ACINFO" fun="ParseACINFO()"/-->
   <!--periodic fun="timetesting()" freq="1." autorun="TRUE"/-->
   <makefile>
