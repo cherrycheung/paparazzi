@@ -8,6 +8,7 @@
     </target>
     <target name="ap" board="ardrone2">
       <configure name="USE_BARO_BOARD" value="FALSE"/>
+      <define name="TRAFFIC_INFO"/>
     </target>
     <define name="FAILSAFE_DESCENT_SPEED" value="0.5"/>
     <define name="USE_SONAR" value="0"/>

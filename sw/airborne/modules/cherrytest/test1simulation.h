@@ -25,18 +25,7 @@
  */
 
 #include "std.h"
-#include "math/pprz_geodetic_int.h"
-
-#include "subsystems/navigation/common_flight_plan.h"
-#include "subsystems/navigation/traffic_info.h"
-#include "messages.h"
-#include "dl_protocol.h"
 #include <stdio.h>
-#include "subsystems/datalink/datalink.h"
-#include "subsystems/gps.h"
-#include "messages.h"
-#include "subsystems/datalink/downlink.h"
-#include "firmwares/rotorcraft/navigation.h"
 
 /*#ifndef TEST_H__
 #define TEST_H__

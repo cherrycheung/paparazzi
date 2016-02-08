@@ -10,6 +10,7 @@
       <!--configure name="HOST" value="192.168.209.$(AC_ID)"/>
       <configure name="MODEM_HOST" value="192.168.209.13"/-->
       <configure name="USE_BARO_BOARD" value="FALSE"/>
+      <define name="TRAFFIC_INFO"/>
     </target>
     <define name="FAILSAFE_DESCENT_SPEED" value="0.5"/>
     <define name="USE_SONAR" value="0"/>

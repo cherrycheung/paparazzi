@@ -31,12 +31,13 @@
 #include "math.h"
 #include "subsystems/navigation/traffic_info.h"
 #include "subsystems/gps.h"
-#include "messages.h"
+#include "pprzlink/messages.h"
 #include "subsystems/datalink/downlink.h"
 #include "navigation.h"
 #include "generated/flight_plan.h"  //needed to use WP_HOME
 #include "subsystems/ins.h"
 #include "math/pprz_geodetic_float.h"
+#include "math/pprz_geodetic_int.h"
 
 //struct aTest Test;
 
@@ -49,8 +50,8 @@ float d_avo = 0;
 int avoid_detection1()
 {
   // OWN coordinates
-  float own_pos_x = stateGetPositionEnu_f()->x;
-  float own_pos_y = stateGetPositionEnu_f()->y;
+  //float own_pos_x = stateGetPositionEnu_f()->x;
+  //float own_pos_y = stateGetPositionEnu_f()->y;
   float own_speed_x = stateGetSpeedEnu_f()->x;
   float own_speed_y = stateGetSpeedEnu_f()->y;
   float own_course_rad = stateGetHorizontalSpeedDir_f();
@@ -59,17 +60,19 @@ int avoid_detection1()
   float own_heading_deg = (own_heading_rad/M_PI)*180;
   //Test.own_heading_deg = (own_heading_rad/M_PI)*180;
 
+  struct UtmCoor_f own_pos = utm_float_from_gps(&gps,0);
+
   // INTRUDER coordinates
   int ac_id2 = 201;
   struct ac_info_ * intr = get_ac_info(ac_id2);
-  struct ac_info_ intruder;
-  intruder.ac_id = intr->ac_id;
-  intruder.course = intr->course;
-  intruder.east = intr->east - 594535.5000;
-  intruder.north = intr->north - 5760891.5000;
-  intruder.gspeed = intr->gspeed;
-  float int_pos_x = intruder.east;
-  float int_pos_y = intruder.north;
+
+  //float delta_t = Max((int)(gps.tow - ac->itow) / 1000., 0.);
+  // if AC not responding for too long, continue, else compute force
+  //if (delta_t > CARROT) { continue; }
+
+  struct ac_info_ intruder = *intr;
+  //float int_pos_x = intruder.east - 594535.5000;
+  //float int_pos_y = intruder.north - 5760891.5000;
   float int_heading_rad;
   if (intruder.course > M_PI){
     int_heading_rad = intruder.course - 2*M_PI;
@@ -81,15 +84,15 @@ int avoid_detection1()
   float int_speed_x = cos((intruder.course)*-1 + 0.5*M_PI)*intruder.gspeed;
   float int_speed_y = sin((intruder.course)*-1 + 0.5*M_PI)*intruder.gspeed;
 
-  float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y);
-  float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
+  float angle_global = calcGlobalAngle1(own_pos.east, own_pos.north, intruder.east, intruder.north);
+  float angle_azimuth = calcAzimuthAngle1(own_pos.east, own_pos.north, intruder.east, intruder.north,own_heading_deg);
   //float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_course_deg);
   //Test.angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, int_pos_x, int_pos_y,own_heading_deg);
 
   /* Avoidance data */
   float rpz = 0.5;
   d_avo = 1.8;
-  float d_oi = sqrt(powf((own_pos_x - int_pos_x),2) + powf((own_pos_y - int_pos_y),2));
+  float d_oi = sqrt(powf((own_pos.east - intruder.east),2) + powf((own_pos.north - intruder.north),2));
 
   // YAZDI'S EQUATIONS
   float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
@@ -111,10 +114,10 @@ int avoid_detection1()
   //printf("drone1: cc %f dd %f angle %f alpha %f\n", cc, dd, avoid_angle2/M_PI*180,alpha_vo/M_PI*180);
 
   printf("drone1: own heading %f int heading %f\n", own_heading_deg, int_heading_deg);
-  
+
   // Right of way
   float row_angle = int_heading_deg - own_heading_deg;
-//  float row_angle = int_heading_deg - own_course_deg;
+  // float row_angle = int_heading_deg - own_course_deg;
   int row_zone;
   if (row_angle >= -45 && row_angle <= 45){
     row_zone = 1;

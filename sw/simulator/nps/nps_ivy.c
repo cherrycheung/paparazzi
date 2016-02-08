@@ -42,12 +42,12 @@ static void on_ACINFO(IvyClientPtr app __attribute__((unused)),
         float c = RadOfDeg((atoi(argv[1]))/10.);
 	float ux = (atoi(argv[2]))/100.;
 	float uy = (atoi(argv[3]))/100.;
-	float a = (atoi(argv[4]))/100.; 
+	float a = (atoi(argv[4]))/100.;
 	float t = (atoi(argv[5]))/1000.;
-	float s = (atoi(argv[6]))/100.; 
-	float cl = (atoi(argv[7]))/100.;      
+	float s = (atoi(argv[6]))/100.;
+	float cl = (atoi(argv[7]))/100.;
 	uint8_t id = atoi(argv[8]);
-	SetAcInfo(id,ux, uy, c, a, s, cl, t);
+	set_ac_info(id,ux, uy, c, a, s, cl, t);
 }
 
 void nps_ivy_init(char *ivy_bus)
