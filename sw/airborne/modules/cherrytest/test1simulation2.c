@@ -110,6 +110,8 @@ int avoid_detection1()
   //printf("drone1: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n", own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
   //printf("drone1: cc %f dd %f angle %f alpha %f\n", cc, dd, avoid_angle2/M_PI*180,alpha_vo/M_PI*180);
 
+  printf("drone1: own heading %f int heading %f\n", own_heading_deg, int_heading_deg);
+  
   // Right of way
   float row_angle = int_heading_deg - own_heading_deg;
 //  float row_angle = int_heading_deg - own_course_deg;
