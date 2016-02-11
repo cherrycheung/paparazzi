@@ -52,8 +52,8 @@ int avoid_detection1()
   // FILL IN //
   int useheadingcourse = 1;
   int ac_id2 = 201;
-  float rpz = 0.9;
-  d_avo = 1.5;
+  float rpz = 0.4;
+  d_avo = 1.9;
 
   // OWN coordinates
   struct UtmCoor_f own_pos = utm_float_from_gps(&gps,0);

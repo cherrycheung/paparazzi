@@ -5,6 +5,7 @@
   <firmware name="rotorcraft">
     <target name="ap" board="ardrone2">
       <configure name="USE_BARO_BOARD" value="FALSE"/>
+      <define name="TRAFFIC_INFO"/>
     </target>
 
     <target name="nps" board="pc">
