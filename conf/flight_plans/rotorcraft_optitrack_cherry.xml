@@ -90,7 +90,7 @@
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
       <stay until="stage_time>3" wp="p1"/>
       <exception cond="valueofdetection1 == 1" deroute="h 1 avoid"/>
-      <stay until="stage_time>8" wp="p2"/>
+      <stay until="stage_time>17" wp="p2"/>
       <deroute block="h 2 go to 1"/>
     </block>
 
@@ -114,7 +114,7 @@
       <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
       <stay until="stage_time>3" wp="p2"/>
       <exception cond="valueofdetection1 == 1" deroute="h 2 avoid"/>
-      <stay until="stage_time>10" wp="p1"/>
+      <stay until="stage_time>17" wp="p1"/>
       <deroute block="h 1 go to 2"/>
     </block>
 

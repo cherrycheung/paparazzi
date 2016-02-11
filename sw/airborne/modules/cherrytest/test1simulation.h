@@ -31,7 +31,7 @@
 #define TEST_H__
 
 struct aTest {
-  float own_heading_deg;
+  float own_direction_deg;
   float angle_azimuth;
 };
 extern struct aTest Test;
@@ -47,4 +47,4 @@ extern int safe_setting1(void);
 extern int valueofdetection1;
 extern int valueofnavigation1;
 extern float angle_azimuth;
-extern float own_heading_deg;
+extern float own_direction_deg;
