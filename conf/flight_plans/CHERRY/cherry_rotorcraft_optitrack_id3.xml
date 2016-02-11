@@ -1,17 +1,17 @@
-<!DOCTYPE flight_plan SYSTEM "flight_plan.dtd">
+<!DOCTYPE flight_plan SYSTEM "../flight_plan.dtd">
 
 <flight_plan alt="1.5" ground_alt="0" lat0="51.9906325" lon0="4.3767988" max_dist_from_home="15" name="Rotorcraft Basic (Enac)" security_height="0.5">
   <header>
 #include "autopilot.h"
-</header> 
+</header>
   <waypoints>
     <waypoint name="HOME" x="0.0" y="0.0"/>
+    <waypoint name="TD" x="0.0" y="0.0"/>
     <waypoint name="CLIMB" x="0.0" y="0.0"/>
     <waypoint name="STDBY" x="0.0" y="0.0"/>
-    <waypoint name="TD" x="0.0" y="0.0"/>
+    <waypoint name="p1" x="2.5" y="0.0"/>
+    <waypoint name="p2" x="-2.5" y="0.0"/>
     <waypoint lat="51.9906136" lon="4.3767908" name="FLEX2"/>
-    <waypoint name="p1" x="-2.5" y="0.0"/>
-    <waypoint name="p2" x="2.5" y="0.0"/>
     <waypoint lat="51.990646" lon="4.376724" name="FA1"/>
     <waypoint lat="51.990677" lon="4.376812" name="FA2"/>
     <waypoint lat="51.990624" lon="4.376867" name="FA3"/>
@@ -55,18 +55,20 @@
     <block name="Start Engine">
       <call fun="NavResurrect()"/>
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
+      <deroute block="Takeoff"/>
     </block>
     <block name="Takeoff" strip_button="Takeoff" strip_icon="takeoff.png">
       <exception cond="stateGetPositionEnu_f()->z > 2.0" deroute="Standby"/>
       <call fun="NavSetWaypointHere(WP_CLIMB)"/>
       <stay climb="0.5" vmode="climb" wp="CLIMB"/>
     </block>
+
     <block name="Standby" strip_button="Standby" strip_icon="home.png">
       <stay until="stage_time>3" wp="STDBY"/>
       <stay wp="p1"/>
     </block>
 
-     <block name="test point to 2">
+    <block name="test point to 2">
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
       <stay wp="p1"/>
     </block>
@@ -88,7 +90,7 @@
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
       <stay until="stage_time>3" wp="p1"/>
       <exception cond="valueofdetection1 == 1" deroute="h 1 avoid"/>
-      <stay until="stage_time>18" wp="p2"/>
+      <stay until="stage_time>17" wp="p2"/>
       <deroute block="h 2 go to 1"/>
     </block>
 
@@ -112,7 +114,7 @@
       <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
       <stay until="stage_time>3" wp="p2"/>
       <exception cond="valueofdetection1 == 1" deroute="h 2 avoid"/>
-      <stay until="stage_time>18" wp="p1"/>
+      <stay until="stage_time>17" wp="p1"/>
       <deroute block="h 1 go to 2"/>
     </block>
 
@@ -174,7 +176,9 @@
       <deroute block="c 1 go to 2"/>
     </block>
 
-
+    <block name="land here" strip_button="Land Here" strip_icon="land-right.png">
+      <call fun="NavSetWaypointHere(WP_TD)"/>
+    </block>
     <block name="land">
       <go wp="TD"/>
     </block>
