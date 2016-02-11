@@ -52,8 +52,8 @@ int avoid_detection1()
   // FILL IN //
   int useheadingcourse = 1;
   int ac_id2 = 201;
-  float rpz = 0.4;
-  d_avo = 1.6;
+  float rpz = 0.9;
+  d_avo = 1.5;
 
   // OWN coordinates
   struct UtmCoor_f own_pos = utm_float_from_gps(&gps,0);
@@ -104,9 +104,10 @@ int avoid_detection1()
   float own_speed = sqrt(powf((own_speed_x),2)+powf((own_speed_y),2));
   float avoid_angle = acos(BB);
 
+  //printf("drone %d: d_oi %f\n",AC_ID,d_oi);
+  //printf("drone %d: d_oi %f own x y %f %f int x y %f %f\n",AC_ID,d_oi,own_pos.east,own_pos.north,intruder.east,intruder.north);
   //printf("drone1: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n", own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
   //printf("drone1: cc %f dd %f angle %f alpha %f\n", cc, dd, avoid_angle2/M_PI*180,alpha_vo/M_PI*180);
-
   //printf("drone %d: own direction %f int direction %f\n",AC_ID, own_direction_deg, int_direction_deg);
 
   // Right of way
@@ -137,6 +138,7 @@ int avoid_detection1()
     if (own_speed > 0.08){
       if (own_direction_deg > (angle_global - 100) &&  own_direction_deg < (angle_global + 100)){
         if (avoid_angle < alpha_vo && BB > 0){
+          printf("drone %d: inside \n", AC_ID);
           if (d_oi < d_avo){
             //if (row_zone == 1 || row_zone == 3 || row_zone == 4){
               valueofdetection1 = 1;

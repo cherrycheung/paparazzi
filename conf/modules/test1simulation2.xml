@@ -1,20 +1,15 @@
 <!DOCTYPE module SYSTEM "module.dtd">
 
-<module name="test1simulation2" dir="cherrytest">
+<module name="test1simulation" dir="cherrytest">
   <doc>
     <description>
-	Let me try to a calculation here in simulation
+	Cherry's module
     </description>
-    <define name="HOME_AC_ID"               description="home"/>
-
   </doc>
-
   <header>
     <file name="test1simulation2.h"/>
   </header>
-  <periodic fun="avoid_detection1()" freq="2." autorun="FALSE"/>
-  <!--datalink message="ACINFO" fun="ParseACINFO()"/-->
-  <!--periodic fun="timetesting()" freq="1." autorun="TRUE"/-->
+  <periodic fun="avoid_detection1()" freq="5." autorun="FALSE"/>
   <makefile>
     <file name="test1simulation2.c"/>
   </makefile>
