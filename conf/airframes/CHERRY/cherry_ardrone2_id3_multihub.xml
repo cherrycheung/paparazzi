@@ -7,7 +7,7 @@
     <!-- HOST is the Name or IP of your AC -->
     <configure name="HOST" value="192.168.0.3"/>
     <!-- MODEM_HOST is where the data should go to, for short normally your laptop IP address -->
-    <configure name="MODEM_HOST" value="192.168.0.18"/>
+    <configure name="MODEM_HOST" value="192.168.0.23"/>
 
     <configure name="MODEM_BROADCAST" value="FALSE"/>
     <!-- <define name="MODEM_HOST" value="\\\"192.168.209.112\\\""/>-->
@@ -32,7 +32,7 @@
     <subsystem name="actuators" type="ardrone2"/>
     <subsystem name="imu" type="ardrone2"/>
     <!-- gps: "ublox" or change to "sirf" for usage with parrot flight recorder -->
-    <subsystem name="gps" type="ublox"/>
+    <subsystem name="gps" type="datalink"/>
     <subsystem name="stabilization" type="int_quat"/>
     <subsystem name="ahrs" type="int_cmpl_quat"/>
     <subsystem name="ins" type="extended"/>
