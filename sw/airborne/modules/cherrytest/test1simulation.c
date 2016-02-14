@@ -72,7 +72,7 @@ int avoid_detection1()
 
   // INTRUDER coordinates
   struct ac_info_ * intr = get_ac_info(ac_id2);
-  //float delta_t = Max((int)(gps.tow - ac->itow) / 1000., 0.);
+  //float delta_t = Max((int)(gps.tow - intr->itow) / 1000., 0.);
   // if AC not responding for too long, continue, else compute force
   //if (delta_t > CARROT) { continue; }
   struct ac_info_ intruder = *intr;
