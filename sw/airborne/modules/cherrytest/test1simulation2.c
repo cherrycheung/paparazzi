@@ -51,7 +51,7 @@ int avoid_detection1()
 {
   // FILL IN //
   int useheadingcourse = 1;
-  int ac_id2 = 201;
+  int ac_id2 = 33;
   float rpz = 0.4;
   d_avo = 1.9;
 
@@ -134,7 +134,7 @@ int avoid_detection1()
     //printf("drone %d: converging right\n",AC_ID);
   }
 
-  if (d_oi > rpz){
+  /*if (d_oi > rpz){
     if (own_speed > 0.08){
       if (own_direction_deg > (angle_global - 100) &&  own_direction_deg < (angle_global + 100)){
         if (avoid_angle < alpha_vo && BB > 0){
@@ -169,9 +169,35 @@ int avoid_detection1()
         }
       }
     }
+  }*/
+
+  if(own_speed>0 && own_direction_deg > (angle_global - 100) &&  own_direction_deg < (angle_global + 100)){
+    if (d_oi > rpz){
+      /*printf("drone%d: outside the protected zone %f \n", AC_ID,d_oi);
+      printf("drone%d: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
+      printf("drone%d: avoidangle %f alphavo %f BB %f\n", AC_ID,avoid_angle,alpha_vo,BB);*/
+      if (avoid_angle < alpha_vo && BB > 0){
+        printf("drone%d: inside VO \n", AC_ID);
+        if (d_oi < d_avo){
+          valueofdetection1 = 1;
+          azimuth = angle_azimuth;
+          own_direction = own_direction_deg;
+          printf("drone%d: YUP \n", AC_ID);
+        }
+      }
+      else{
+        printf("drone%d: outside VO \n", AC_ID);
+      }
+    }
+    else{
+      printf("drone%d: inside the protected zone DANGER %f\n", AC_ID,d_oi);
+      valueofdetection1 = 1;
+    }
   }
   return(0);
 }
+
+
 
 int avoid_navigation1(uint8_t wpb,float angle_avoid){
   float angle_avoidance;
