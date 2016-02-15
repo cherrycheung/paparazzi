@@ -22,8 +22,8 @@
     <subsystem name="ins" type="extended"/>
   </firmware>
 
-  <modules main_freq="60">
-    <load name="test1simulation.xml"/>
+  <modules main_freq="512">
+    <load name="test1simulation2.xml"/>
   </modules>
 
   <commands>

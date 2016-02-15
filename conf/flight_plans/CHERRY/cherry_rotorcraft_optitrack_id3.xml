@@ -1,25 +1,22 @@
 <!DOCTYPE flight_plan SYSTEM "../flight_plan.dtd">
 
-<flight_plan alt="1.5" ground_alt="0" lat0="51.9906325" lon0="4.3767988" max_dist_from_home="15" name="Rotorcraft Basic (Enac)" security_height="0.5">
+<flight_plan alt="1.5" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="20" name="Rotorcraft Optitrack (Delft)" security_height="0.3">
   <header>
 #include "autopilot.h"
 </header>
   <waypoints>
     <waypoint name="HOME" x="0.0" y="0.0"/>
-    <waypoint name="TD" x="0.0" y="0.0"/>
-    <waypoint name="CLIMB" x="0.0" y="0.0"/>
-    <waypoint name="STDBY" x="0.0" y="0.0"/>
-    <waypoint name="p1" x="2.5" y="0.0"/>
-    <waypoint name="p2" x="-2.5" y="0.0"/>
-    <waypoint lat="51.9906136" lon="4.3767908" name="FLEX2"/>
-    <waypoint lat="51.990646" lon="4.376724" name="FA1"/>
-    <waypoint lat="51.990677" lon="4.376812" name="FA2"/>
-    <waypoint lat="51.990624" lon="4.376867" name="FA3"/>
-    <waypoint lat="51.990593" lon="4.376779" name="FA4"/>
-    <waypoint lat="51.9906253" lon="4.3768574" name="FZ3"/>
-    <waypoint lat="51.9905993" lon="4.3767808" name="FZ4"/>
-    <waypoint lat="51.9906445" lon="4.3767337" name="FZ1"/>
-    <waypoint lat="51.9906707" lon="4.3768103" name="FZ2"/>
+    <waypoint name="CLIMB" x="1.2" y="-0.6"/>
+    <waypoint name="GOAL" x="2.0" y="2.0"/>
+    <waypoint name="TD" x="0.8" y="-1.7"/>
+    <waypoint lat="51.990630" lon="4.376823" name="FLEX2"/>
+    <waypoint lat="51.990630" lon="4.376823" name="STDBY"/>
+    <waypoint lat="51.9906452" lon="4.3768178" name="p1"/>
+    <waypoint lat="51.9906277" lon="4.3767593" name="p2"/>
+    <waypoint lat="51.9906213" lon="4.3768628" name="FA1"/>
+    <waypoint lat="51.9905874" lon="4.3767766" name="FA2"/>
+    <waypoint lat="51.9906409" lon="4.3767226" name="FA3"/>
+    <waypoint lat="51.9906737" lon="4.3768074" name="FA4"/>
   </waypoints>
   <sectors>
     <sector color="red" name="Flight_Area">
@@ -28,25 +25,11 @@
       <corner name="FA2"/>
       <corner name="FA1"/>
     </sector>
-    <sector color="blue" name="Flight_Zone">
-      <corner name="FZ2"/>
-      <corner name="FZ3"/>
-      <corner name="FZ4"/>
-      <corner name="FZ1"/>
-    </sector>
   </sectors>
   <blocks>
     <block name="Wait GPS">
       <call fun="NavKillThrottle()"/>
       <while cond="!GpsFixValid()"/>
-    </block>
-    <block name="Geo init">
-      <while cond="LessThan(NavBlockTime(), 10)"/>
-      <call fun="NavSetWaypointHere(WP_HOME)"/>
-      <call fun="NavSetWaypointHere(WP_CLIMB)"/>
-      <call fun="NavSetWaypointHere(WP_STDBY)"/>
-      <call fun="NavSetWaypointHere(WP_TD)"/>
-      <call fun="NavSetAltitudeReferenceHere()"/>
     </block>
     <block name="Holding point">
       <call fun="NavKillThrottle()"/>
@@ -55,37 +38,30 @@
     <block name="Start Engine">
       <call fun="NavResurrect()"/>
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
-      <deroute block="Takeoff"/>
     </block>
     <block name="Takeoff" strip_button="Takeoff" strip_icon="takeoff.png">
-      <exception cond="stateGetPositionEnu_f()->z > 2.0" deroute="Standby"/>
+      <exception cond="stateGetPositionEnu_f()->z > 1.0" deroute="Standby"/>
       <call fun="NavSetWaypointHere(WP_CLIMB)"/>
-      <stay climb="0.5" vmode="climb" wp="CLIMB"/>
+      <stay climb="nav_climb_vspeed" vmode="climb" wp="CLIMB"/>
     </block>
-
     <block name="Standby" strip_button="Standby" strip_icon="home.png">
       <stay until="stage_time>3" wp="STDBY"/>
       <stay wp="p1"/>
     </block>
-
     <block name="test point to 2">
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
       <stay wp="p1"/>
     </block>
-
     <block name="test go to 2">
       <stay wp="p2"/>
     </block>
-
     <block name="test point to 1">
       <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
       <stay wp="p2"/>
     </block>
-
     <block name="test go to 1">
       <stay wp="p1"/>
     </block>
-
     <block name="h 1 go to 2" pre_call="avoid_detection1()">
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
       <stay until="stage_time>3" wp="p1"/>
@@ -93,7 +69,6 @@
       <stay until="stage_time>17" wp="p2"/>
       <deroute block="h 2 go to 1"/>
     </block>
-
     <block name="h 1 avoid">
       <call fun="safe_setting1()"/>
       <call fun="avoid_navigation1(WP_FLEX2,45)"/>
@@ -103,13 +78,11 @@
       <stay until="stage_time>1" wp="p2"/>
       <deroute block="h 1 goal"/>
     </block>
-
     <block name="h 1 goal" pre_call="avoid_detection1()">
       <exception cond="valueofdetection1 == 1" deroute="h 1 avoid"/>
       <stay until="stage_time>8" wp="p2"/>
       <deroute block="h 2 go to 1"/>
     </block>
-
     <block name="h 2 go to 1" pre_call="avoid_detection1()">
       <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
       <stay until="stage_time>3" wp="p2"/>
@@ -120,7 +93,7 @@
 
     <block name="h 2 avoid">
       <call fun="safe_setting1()"/>
-      <call fun="avoid_navigation1(WP_FLEX2,45)"/>
+      <call fun="avoid_navigation1(WP_FLEX2,35)"/>
       <stay until="stage_time>8"wp="FLEX2"/>
       <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
       <stay until="stage_time>2"wp="FLEX2"/>
@@ -186,9 +159,10 @@
       <exception cond="NavDetectGround()" deroute="Holding point"/>
       <exception cond="!nav_is_in_flight()" deroute="landed"/>
       <call fun="NavStartDetectGround()"/>
-      <stay climb="-0.8" vmode="climb" wp="TD"/>
+      <stay climb="nav_descend_vspeed" vmode="climb" wp="TD"/>
     </block>
     <block name="landed">
+      <call fun="NavKillThrottle()"/>
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
   </blocks>

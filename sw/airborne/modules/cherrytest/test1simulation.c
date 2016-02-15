@@ -104,7 +104,7 @@ int avoid_detection1()
   float own_speed = sqrt(powf((own_speed_x),2)+powf((own_speed_y),2));
   float avoid_angle = acos(BB);
 
-  //printf("drone %d: d_oi %f own x y %f %f int x y %f %f\n",AC_ID,d_oi,own_pos.east,own_pos.north,intruder.east,intruder.north);
+  printf("drone %d: d_oi %f own x y %f %f int x y %f %f\n",AC_ID,d_oi,own_pos.east,own_pos.north,intruder.east,intruder.north);
   //printf("drone %d: d_oi %f\n",AC_ID,d_oi);
   //printf("drone1: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n", own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
   //printf("drone1: cc %f dd %f angle %f alpha %f\n", cc, dd, avoid_angle2/M_PI*180,alpha_vo/M_PI*180);
@@ -132,7 +132,7 @@ int avoid_detection1()
   if(own_speed>0 && own_direction_deg > (angle_global - 100) &&  own_direction_deg < (angle_global + 100)){
     if (d_oi > rpz){
       printf("drone%d: outside the protected zone %f \n", AC_ID,d_oi);
-      printf("drone%d: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
+      //printf("drone%d: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
       printf("drone%d: avoidangle %f alphavo %f BB %f\n", AC_ID,avoid_angle,alpha_vo,BB);
       if (avoid_angle < alpha_vo && BB > 0){
         printf("drone%d: inside VO \n", AC_ID);

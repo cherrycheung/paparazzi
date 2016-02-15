@@ -3,9 +3,21 @@
 <airframe name="ardrone2_optitrack">
 
   <firmware name="rotorcraft">
+
+    <!-- HOST is the Name or IP of your AC -->
+    <configure name="HOST" value="192.168.0.4"/>
+    <!-- MODEM_HOST is where the data should go to, for short normally your laptop IP address -->
+    <configure name="MODEM_HOST" value="192.168.0.44"/>
+
+    <configure name="MODEM_BROADCAST" value="FALSE"/>
+    <!-- <define name="MODEM_HOST" value="\\\"192.168.209.112\\\""/>-->
+    <!--<define name="UDP0_HOST" value="192.168.209.112"/>
+    <define name="UDP1_HOST" value="192.168.209.112"/>-->
+    <!--<configure name="ARDRONE2_IP_ADDRESS_PROBE" value="$(AC_ID)"/>   -->
+
     <target name="ap" board="ardrone2">
-      <configure name="USE_BARO_BOARD" value="FALSE"/>
       <define name="TRAFFIC_INFO"/>
+      <configure name="USE_BARO_BOARD" value="FALSE"/>
     </target>
 
     <target name="nps" board="pc">
@@ -31,7 +43,7 @@
   <modules main_freq="512">
     <load name="test1simulation.xml"/>
     <load name="bat_voltage_ardrone2.xml"/>
-    <load name="stereocam_droplet.xml" />
+    <!--load name="stereocam_droplet.xml" /-->
   </modules>
 
   <commands>
