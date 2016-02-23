@@ -52,13 +52,16 @@ int avoid_detection1()
   // FILL IN //
   int useheadingcourse = 1;
   int ac_id2 = 3;
-  float rpz = 1.0;
-  d_avo = 2.0;
+  float rpz = 0.8;
+  d_avo = 1.5;
 
   // OWN coordinates
   struct UtmCoor_f own_pos = utm_float_from_gps(&gps,0);
   float own_pos_enu_x = stateGetPositionEnu_f()->x;
   float own_pos_enu_y = stateGetPositionEnu_f()->y;
+
+  float own_pos_utm_x = stateGetPositionUtm_f()->east;
+  float own_pos_utm_y = stateGetPositionUtm_f()->north;
   //float own_pos_x = own_pos.east;
   //float own_pos_y = own_pos.north;
   float own_pos_x = own_pos_enu_x;
@@ -114,7 +117,7 @@ int avoid_detection1()
   float avoid_angle = acos(BB);
 
   //printf("drone %d: d_oi %f own x y %f %f int x y %f %f\n",AC_ID,d_oi,own_pos_x,own_pos_y,intr_pos_x,intr_pos_y);
-  printf("drone %d: d_oi %f enu x y %f %f intr x y %f %f\n",AC_ID,d_oi,own_pos_enu_x,own_pos_enu_y,intr_pos_x,intr_pos_y);
+  printf("drone %d: d_oi %f utm x y %f %f enu x y %f %f intr x y %f %f\n",AC_ID,d_oi,own_pos_utm_x,own_pos_utm_y,own_pos_x,own_pos_y,intr_pos_x,intr_pos_y);
   //printf("drone %d: d_oi %f\n",AC_ID,d_oi);
   //printf("drone1: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n", own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
   //printf("drone1: cc %f dd %f angle %f alpha %f\n", cc, dd, avoid_angle2/M_PI*180,alpha_vo/M_PI*180);

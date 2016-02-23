@@ -196,6 +196,8 @@
     <define name="IGAIN" value="30"/>
     <define name="VGAIN" value="0"/>
     <define name="AGAIN" value="0"/>
+ <define name="REF_MAX_SPEED" value="0.75"/>
+
   </section>
 
   <section name="SIMULATOR" prefix="NPS_">

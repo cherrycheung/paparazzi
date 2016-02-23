@@ -676,8 +676,13 @@ static inline struct UtmCoor_f *stateGetPositionUtm_f(void)
 {
   if (!bit_is_set(state.pos_status, POS_UTM_F)) {
     stateCalcPositionUtm_f();
+ //utm_of_lla_f(&state.utm_pos_f, &state.lla_pos_f);
+//SetBit(state.pos_status, POS_UTM_F);
   }
+  //printf("statevalue %f\n",&state.utm_pos_f);
+  //state.utm_pos_f.east = 77;
   return &state.utm_pos_f;
+
 }
 
 /// Get position in ECEF coordinates (float).

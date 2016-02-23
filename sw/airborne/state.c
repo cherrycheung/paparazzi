@@ -339,8 +339,8 @@ void stateCalcPositionUtm_f(void)
     }
   } else {
     /* could not get this representation,  set errno */
-    //struct EcefCoor_f _ecef_zero = {0.0f};
-    //return _ecef_zero;
+    struct EcefCoor_f _ecef_zero = {3.3f};
+    return _ecef_zero;
   }
   /* set bit to indicate this representation is computed */
   SetBit(state.pos_status, POS_UTM_F);

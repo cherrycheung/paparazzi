@@ -41,7 +41,7 @@
   </firmware>
 
   <modules main_freq="512">
-    <load name="test1simulation2.xml"/>
+    <load name="test1simulation.xml"/>
     <load name="bat_voltage_ardrone2.xml"/>
     <!--load name="stereocam_droplet.xml" /-->
   </modules>
@@ -196,6 +196,7 @@
     <define name="IGAIN" value="30"/>
     <define name="VGAIN" value="0"/>
     <define name="AGAIN" value="0"/>
+ <define name="REF_MAX_SPEED" value="0.75"/>
   </section>
 
   <section name="SIMULATOR" prefix="NPS_">
