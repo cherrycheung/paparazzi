@@ -51,12 +51,18 @@ int avoid_detection1()
 {
   // FILL IN //
   int useheadingcourse = 1;
-  int ac_id2 = 44;
+  int ac_id2 = 4;
   float rpz = 1.0;
   d_avo = 2.0;
 
   // OWN coordinates
   struct UtmCoor_f own_pos = utm_float_from_gps(&gps,0);
+  float own_pos_enu_x = stateGetPositionEnu_f()->x;
+  float own_pos_enu_y = stateGetPositionEnu_f()->y;
+  //float own_pos_x = own_pos.east;
+  //float own_pos_y = own_pos.north;
+  float own_pos_x = own_pos_enu_x;
+  float own_pos_y = own_pos_enu_y;
   float own_speed_x = stateGetSpeedEnu_f()->x;
   float own_speed_y = stateGetSpeedEnu_f()->y;
   float own_direction_rad;
@@ -76,6 +82,9 @@ int avoid_detection1()
   // if AC not responding for too long, continue, else compute force
   //if (delta_t > CARROT) { continue; }
   struct ac_info_ intruder = *intr;
+  float intr_pos_x = intruder.east - 594534.812500;
+  float intr_pos_y = intruder.north - 5760891.5;
+
   float int_direction_rad;
   if (intruder.course > M_PI){
     int_direction_rad = intruder.course - 2*M_PI;
@@ -87,9 +96,9 @@ int avoid_detection1()
   float int_speed_x = cos((intruder.course)*-1 + 0.5*M_PI)*intruder.gspeed;
   float int_speed_y = sin((intruder.course)*-1 + 0.5*M_PI)*intruder.gspeed;
 
-  float angle_global = calcGlobalAngle1(own_pos.east, own_pos.north, intruder.east, intruder.north);
-  float angle_azimuth = calcAzimuthAngle1(own_pos.east, own_pos.north, intruder.east, intruder.north,own_direction_deg);
-  float d_oi = sqrt(powf((own_pos.east - intruder.east),2) + powf((own_pos.north - intruder.north),2));
+  float angle_global = calcGlobalAngle1(own_pos_x, own_pos_y, intr_pos_x, intr_pos_y);
+  float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, intr_pos_x, intr_pos_y,own_direction_deg);
+  float d_oi = sqrt(powf((own_pos_x - intr_pos_x),2) + powf((own_pos_y - intr_pos_y),2));
 
   // Avoidance
   float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
@@ -104,7 +113,8 @@ int avoid_detection1()
   float own_speed = sqrt(powf((own_speed_x),2)+powf((own_speed_y),2));
   float avoid_angle = acos(BB);
 
-  printf("drone %d: d_oi %f own x y %f %f int x y %f %f\n",AC_ID,d_oi,own_pos.east,own_pos.north,intruder.east,intruder.north);
+  //printf("drone %d: d_oi %f own x y %f %f int x y %f %f\n",AC_ID,d_oi,own_pos_x,own_pos_y,intr_pos_x,intr_pos_y);
+  printf("drone %d: d_oi %f enu x y %f %f intr x y %f %f\n",AC_ID,d_oi,own_pos_enu_x,own_pos_enu_y,intr_pos_x,intr_pos_y);
   //printf("drone %d: d_oi %f\n",AC_ID,d_oi);
   //printf("drone1: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n", own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
   //printf("drone1: cc %f dd %f angle %f alpha %f\n", cc, dd, avoid_angle2/M_PI*180,alpha_vo/M_PI*180);
