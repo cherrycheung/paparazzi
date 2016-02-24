@@ -72,7 +72,7 @@
     </block>
     <block name="h 1 avoid">
       <call fun="safe_setting1()"/>
-      <call fun="avoid_navigation1(WP_FLEX2,45)"/>
+      <call fun="avoid_navigation1(WP_FLEX2,60)"/>
       <stay until="stage_time>8"wp="FLEX2"/>
       <call fun="nav_set_heading_towards_waypoint(WP_p2)"/>
       <stay until="stage_time>2"wp="FLEX2"/>
@@ -94,7 +94,7 @@
 
     <block name="h 2 avoid">
       <call fun="safe_setting1()"/>
-      <call fun="avoid_navigation1(WP_FLEX2,35)"/>
+      <call fun="avoid_navigation1(WP_FLEX2,60)"/>
       <stay until="stage_time>8"wp="FLEX2"/>
       <call fun="nav_set_heading_towards_waypoint(WP_p1)"/>
       <stay until="stage_time>2"wp="FLEX2"/>
