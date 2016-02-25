@@ -44,6 +44,8 @@ int valueofnavigation1 = 0;
 float azimuth = 0;
 float own_direction = 0;
 float d_avo = 0;
+float alphaalpha_avo = 0;
+float margin_avo = 0;
 
 int avoid_detection1()
 {
@@ -51,9 +53,10 @@ int avoid_detection1()
   int useheading = 1; // 1 for heading
   int useutmorenu = 2; // 2 for enu
   int userow = 0; // 1 for row
-  float rpz = 0.5;
-  d_avo = 1.5;
+  float rpz = 0.8;
+  d_avo = 1.5; /////// IMPORTANT /////////
   int ac_id1 = 3;
+  margin_avo = 1.0;
 
   int ac_id2;
   if (simulation == 1){
@@ -145,7 +148,7 @@ int avoid_detection1()
   //float angle_azimuth_rad = ((angle_azimuth/180)*M_PI);
   //printf("angle azimuth %f %f %f %f \n",angle_azimuth_rad,abs(angle_azimuth_rad),acos(angle_azimuth_rad),acos(abs(angle_azimuth_rad)));
 
-
+  alphaalpha_avo = atan(rpz/d_avo);
 
   // Avoidance module
   float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
@@ -169,34 +172,24 @@ int avoid_detection1()
 
     if (row_angle >= -45 && row_angle <= 45){
       row_zone = 1;
+      printf("drone %d: same path\n",AC_ID);
     }
     else if(row_angle > 45 && row_angle < 136){
       row_zone = 2;
+      printf("drone %d: converging left and has right of way\n",AC_ID);
     }
     else if(row_angle >= 136 && row_angle <= 180){
       row_zone = 3;
+      printf("drone %d: head on\n",AC_ID);
     }
     else if(row_angle >= -180 && row_angle <= -136){
       row_zone = 3;
+      printf("drone %d: head on\n",AC_ID);
     }
     else if(row_angle >= -135 && row_angle <= -46){
       row_zone = 4;
+      printf("drone %d: converging right\n",AC_ID);
     }
-  }
-  if (row_zone == 1){
-    printf("drone %d: same path\n",AC_ID);
-  }
-  else if(row_zone == 2){
-    printf("drone %d: converging left and has right of way\n",AC_ID);
-  }
-  else if(row_zone == 3){
-    printf("drone %d: head on\n",AC_ID);
-  }
-  else if(row_zone == 3){
-    printf("drone %d: head on\n",AC_ID);
-  }
-  else if(row_zone == 4){
-    printf("drone %d: converging right\n",AC_ID);
   }
 
   printf("drone%d: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
@@ -256,19 +249,20 @@ int avoid_detection1()
       valueofdetection1 = 1;
       azimuth = angle_azimuth;
       own_direction = own_direction_deg;
-      printf("drone%d: not moving intruder %f %f", AC_ID,angle_azimuth_rad/M_PI*180,atan(d_oi/rpz)/M_PI*180);
+      printf("drone%d: not moving intruder %f %f\n", AC_ID,(angle_azimuth_rad/M_PI)*180,(atan(d_oi/rpz))/M_PI*180);
+      printf("drone%d: not moving intruder %f %f\n", AC_ID,angle_azimuth_rad,atan(d_oi/rpz));
     }
   }
   return(0);
 }
 
-int avoid_navigation1(uint8_t wpb,float angle_avoid){
+int avoid_navigation1(uint8_t wpb){
   float angle_avoidance;
-  angle_avoidance = own_direction + angle_avoid;
-  float angle_avoidance_rad = angle_avoidance/180*M_PI;
+  angle_avoidance = own_direction/180*M_PI + alphaalpha_avo;
+  float angle_avoidance_rad = angle_avoidance;
 
-  float avoid_x = d_avo*1.2 * sin(angle_avoidance_rad);
-  float avoid_y = d_avo*1.2 * cos(angle_avoidance_rad);
+  float avoid_x = d_avo*margin_avo * sin(angle_avoidance_rad);
+  float avoid_y = d_avo*margin_avo * cos(angle_avoidance_rad);
 
   NavCherry(wpb,avoid_x,avoid_y);
   nav_set_heading_towards(avoid_x + stateGetPositionEnu_f()->x, avoid_y + stateGetPositionEnu_f()->y);

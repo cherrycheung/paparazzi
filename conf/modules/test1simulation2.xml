@@ -9,7 +9,7 @@
   <header>
     <file name="test1simulation2.h"/>
   </header>
-  <periodic fun="avoid_detection1()" freq="10." autorun="FALSE"/>
+  <periodic fun="avoid_detection1()" freq="3." autorun="FALSE"/>
   <makefile>
     <file name="test1simulation2.c"/>
   </makefile>
