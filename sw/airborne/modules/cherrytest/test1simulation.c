@@ -73,6 +73,7 @@ int avoid_detection1()
     }
   }
 
+
   // OWN data
   float own_pos_x;
   float own_pos_y;
@@ -198,15 +199,16 @@ int avoid_detection1()
     printf("drone %d: converging right\n",AC_ID);
   }
 
-  if(own_speed>0 && own_direction_deg > (angle_global - 100) &&  own_direction_deg < (angle_global + 100)){
+  printf("drone%d: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
+  printf("drone%d: d_vo %f r_vo %f\n",AC_ID, d_vo, r_vo);
+  //printf("drone int: Vix & Viy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
+  printf("drone%d: avoidangle %f alphavo %f BB %f\n", AC_ID,avoid_angle,alpha_vo,BB);
+
+  if(intruder.gspeed>0 && own_speed>0 && own_direction_deg > (angle_global - 100) &&  own_direction_deg < (angle_global + 100)){
     if (d_oi > rpz){
       printf("drone%d: outside the protected zone %f \n", AC_ID,d_oi);
-      printf("drone%d: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
-      printf("drone%d: d_vo %f r_vo %f\n",AC_ID, d_vo, r_vo);
-      //printf("drone int: Vix & Viy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
-      printf("drone%d: avoidangle %f alphavo %f BB %f\n", AC_ID,avoid_angle,alpha_vo,BB);
       if (d_oi < d_avo){
-        if (avoid_angle < alpha_vo && BB > 0 || angle_azimuth < 10){
+        if (avoid_angle < alpha_vo && BB > 0){
           printf("drone%d: inside VO \n", AC_ID);
           if(userow==0){
             valueofdetection1 = 1;
@@ -247,6 +249,14 @@ int avoid_detection1()
     else{
       printf("drone%d: inside the protected zone DANGER %f\n", AC_ID,d_oi);
       valueofdetection1 = 1;
+    }
+  }
+  else if (intruder.gspeed == 0){
+    if (angle_azimuth_rad < atan(rpz/d_oi) && d_oi < d_avo){
+      valueofdetection1 = 1;
+      azimuth = angle_azimuth;
+      own_direction = own_direction_deg;
+      printf("drone%d: not moving intruder %f %f", AC_ID,angle_azimuth_rad/M_PI*180,atan(d_oi/rpz)/M_PI*180);
     }
   }
   return(0);
