@@ -135,12 +135,12 @@ int avoid_detection1()
   float angle_azimuth = calcAzimuthAngle1(own_pos_x, own_pos_y, intr_pos_x, intr_pos_y,own_direction_deg);
   float d_oi = sqrt(powf((own_pos_x - intr_pos_x),2) + powf((own_pos_y - intr_pos_y),2));
   float angle_azimuth_rad;
-  //if(angle_azimuth < 0){
-  //  angle_azimuth_rad = (angle_azimuth*(-1))/180*M_PI;
-  //}
-  //else{
-  //  angle_azimuth_rad = ((angle_azimuth/180)*M_PI);
-  //}
+  if(angle_azimuth < 0){
+    angle_azimuth_rad = (angle_azimuth*(-1))/180*M_PI;
+  }
+  else{
+    angle_azimuth_rad = ((angle_azimuth/180)*M_PI);
+  }
   //float angle_azimuth_rad = ((angle_azimuth/180)*M_PI);
   //printf("angle azimuth %f %f %f %f \n",angle_azimuth_rad,abs(angle_azimuth_rad),acos(angle_azimuth_rad),acos(abs(angle_azimuth_rad)));
 
@@ -153,23 +153,8 @@ int avoid_detection1()
   float DD_vo[2];
   DD_vo[0] = d_vo * cos((angle_azimuth_rad)); /** cos(theta_vo);*/
   DD_vo[1] = d_vo * sin((angle_azimuth_rad)); /** cos(theta_vo);*/
-  float own_speed_x_abs;
-  float own_speed_y_abs;
-  if(own_speed_x < 0){
-    own_speed_x_abs = own_speed_x*-1;
-  }
-  else{
-    own_speed_x_abs = own_speed_x;
-  }
-  if(own_speed_y < 0){
-    own_speed_y_abs = own_speed_y*-1;
-  }
-  else{
-    own_speed_y_abs = own_speed_y;
-  }
-
-  float AA = (own_speed_x_abs-int_speed_x)*DD_vo[0]+(own_speed_y_abs-int_speed_y)*DD_vo[1];
-  float AAA = sqrt(powf((own_speed_x_abs-int_speed_x),2)+powf((own_speed_y_abs-int_speed_y),2))*d_vo;
+  float AA = (own_speed_x-int_speed_x)*DD_vo[0]+(own_speed_y-int_speed_y)*DD_vo[1];
+  float AAA = sqrt(powf((own_speed_x-int_speed_x),2)+powf((own_speed_y-int_speed_y),2))*d_vo;
   float BB = AA/AAA;
   float own_speed = sqrt(powf((own_speed_x),2)+powf((own_speed_y),2));
   float avoid_angle = acos(BB);
@@ -220,9 +205,9 @@ int avoid_detection1()
       printf("drone%d: d_vo %f r_vo %f\n",AC_ID, d_vo, r_vo);
       //printf("drone int: Vix & Viy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
       printf("drone%d: avoidangle %f alphavo %f BB %f\n", AC_ID,avoid_angle,alpha_vo,BB);
-      if (avoid_angle < alpha_vo && BB > 0){
-        printf("drone%d: inside VO \n", AC_ID);
-        if (d_oi < d_avo){
+      if (d_oi < d_avo){
+        if (avoid_angle < alpha_vo && BB > 0 || angle_azimuth < 10){
+          printf("drone%d: inside VO \n", AC_ID);
           if(userow==0){
             valueofdetection1 = 1;
             azimuth = angle_azimuth;
@@ -250,7 +235,7 @@ int avoid_detection1()
               else if(row_zone == 4){
                 printf("drone %d: converging right\n",AC_ID);
               }
-              return(1);
+                return(1);
             }
           }
         }
