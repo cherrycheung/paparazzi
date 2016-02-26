@@ -46,5 +46,6 @@ extern int safe_setting1(void);
 
 extern int valueofdetection1;
 extern int valueofnavigation1;
+
 extern float angle_azimuth;
 extern float own_heading_deg;

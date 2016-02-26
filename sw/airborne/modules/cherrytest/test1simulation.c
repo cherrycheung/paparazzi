@@ -28,7 +28,6 @@
 #include "state.h"
 #include "generated/airframe.h" /* to include the AC_ID */
 #include "subsystems/datalink/datalink.h"
-#include "math.h"
 #include "subsystems/navigation/traffic_info.h"
 #include "subsystems/gps.h"
 #include "pprzlink/messages.h"
@@ -44,38 +43,41 @@ int valueofnavigation1 = 0;
 float azimuth = 0;
 float own_direction = 0;
 float d_avo = 0;
-float alphaalpha_avo = 0;
 float margin_avo = 0;
+float new_waypoint_x = 0;
+float new_waypoint_y = 0;
+float hellobaby = 0;
 
 int avoid_detection1()
 {
-  int simulation = 1; // 1 for simulation
   int useheading = 1; // 1 for heading
   int useutmorenu = 2; // 2 for enu
   int userow = 0; // 1 for row
   float rpz = 0.8;
-  d_avo = 1.0; /////// IMPORTANT /////////
-  int ac_id1 = 4;
   margin_avo = 1.0;
+  hellobaby = 45.0/180.0 * M_PI;
 
+
+  int simulation;
   int ac_id2;
-  if (simulation == 1){
-    if (ac_id1 == 3){
-      ac_id2 = 33;
-    }
-    else{
-      ac_id2 = 44;
-    }
-  }
-  else{
-    if (ac_id1 == 3){
-      ac_id2 = 3;
-    }
-    else{
+  if(AC_ID == 3 || AC_ID == 4){
+    simulation = 0;
+    if(AC_ID == 3){
       ac_id2 = 4;
     }
+    else{
+      ac_id2 = 3;
+    }
   }
-
+  else if(AC_ID == 33 || AC_ID == 44){
+    simulation = 1;
+    if(AC_ID == 33){
+      ac_id2 = 44;
+    }
+    else{
+      ac_id2 = 33;
+    }
+  }
 
   // OWN data
   float own_pos_x;
@@ -84,7 +86,6 @@ int avoid_detection1()
   if (useutmorenu == 1){
     struct UtmCoor_i own_pos;
     own_pos.zone = 31;
-    printf("%d\n",own_pos.zone);
     utm_of_lla_i(&own_pos, &gps.lla_pos);
     own_pos_x = own_pos.east/100;                // in cm
     own_pos_y = own_pos.north/100;               // in cm
@@ -118,7 +119,7 @@ int avoid_detection1()
     intr_pos_x = intruder.east- 594534.8125;
     intr_pos_y = intruder.north - 5760891.500;
   }
-  else{
+  else if(simulation==0){
     intr_pos_x = intruder.east/100-594534.84;
     intr_pos_y = intruder.north/100-5760891.52;;
   }
@@ -148,8 +149,8 @@ int avoid_detection1()
   //float angle_azimuth_rad = ((angle_azimuth/180)*M_PI);
   //printf("angle azimuth %f %f %f %f \n",angle_azimuth_rad,abs(angle_azimuth_rad),acos(angle_azimuth_rad),acos(abs(angle_azimuth_rad)));
 
-  alphaalpha_avo = atan(rpz/d_avo);
-  printf("drone%d: avoidance distance %f rpz %f angle %f \n",AC_ID,d_avo,rpz,alphaalpha_avo/M_PI*180);
+  calcAvoidanceDist(hellobaby, rpz, own_direction_rad, &d_avo, &new_waypoint_x, &new_waypoint_y);
+  printf("drone%d: %f %f %f\n",AC_ID,d_avo,new_waypoint_x,new_waypoint_y);
 
   // Avoidance module
   float d_vo = (d_oi*d_oi - rpz*rpz)/d_oi;
@@ -164,7 +165,7 @@ int avoid_detection1()
   float own_speed = sqrt(powf((own_speed_x),2)+powf((own_speed_y),2));
   float avoid_angle = acos(BB);
 
-  printf("drone%d: d_oi %f own enu  x y %f %f int x y %f %f\n",AC_ID,d_oi,own_pos_x,own_pos_y,intr_pos_x,intr_pos_y);
+  printf("drone%d: d_oi %f own x y %f %f int x y %f %f\n",AC_ID,d_oi,own_pos_x,own_pos_y,intr_pos_x,intr_pos_y);
 
   // Right of way
   int row_zone;
@@ -193,10 +194,10 @@ int avoid_detection1()
     }
   }
 
-  printf("drone%d: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
-  printf("drone%d: d_vo %f r_vo %f\n",AC_ID, d_vo, r_vo);
+  //printf("drone%d: Vox & Voy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
+  //printf("drone%d: d_vo %f r_vo %f\n",AC_ID, d_vo, r_vo);
   //printf("drone int: Vix & Viy %f %f azimuth %f Dvox & Dvoy %f %f\n",AC_ID, own_speed_x, own_speed_y,angle_azimuth,DD_vo[0],DD_vo[1]);
-  printf("drone%d: avoidangle %f alphavo %f BB %f\n", AC_ID,avoid_angle,alpha_vo,BB);
+  //printf("drone%d: avoidangle %f alphavo %f BB %f\n", AC_ID,avoid_angle,alpha_vo,BB);
 
   if(intruder.gspeed>0 && own_speed>0 && own_direction_deg > (angle_global - 100) &&  own_direction_deg < (angle_global + 100)){
     if (d_oi > rpz){
@@ -259,12 +260,12 @@ int avoid_detection1()
 
 int avoid_navigation1(uint8_t wpb){
   float angle_avoidance;
-  angle_avoidance = own_direction/180*M_PI + alphaalpha_avo;
-  printf("alphaalpha2 %f \n",alphaalpha_avo);
+  angle_avoidance = own_direction/180*M_PI + hellobaby;
+  printf("now avoiding with %f and new x y %f %f\n",hellobaby, new_waypoint_x,new_waypoint_y);
   float angle_avoidance_rad = angle_avoidance;
 
-  float avoid_x = d_avo*margin_avo * sin(angle_avoidance_rad);
-  float avoid_y = d_avo*margin_avo * cos(angle_avoidance_rad);
+  float avoid_x = new_waypoint_x;
+  float avoid_y = new_waypoint_y;
 
   NavCherry(wpb,avoid_x,avoid_y);
   nav_set_heading_towards(avoid_x + stateGetPositionEnu_f()->x, avoid_y + stateGetPositionEnu_f()->y);
@@ -434,40 +435,105 @@ float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float i
        return(azimuth_angle);
 }
 
+void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float*y_inc){
+  printf("inside module %f %f %f\n",lala,rpz,ownshipangle_rad);
+  *d_avo1 = rpz/sin(lala);
+  float d_avo2 = *d_avo1 * tan(lala);
+  float d_avot = sqrt((*d_avo1)*(*d_avo1) + d_avo2*d_avo2);
+  int avoidsituation;
+  float ownshipangle2;
 
-/*if (d_oi > rpz){
-  if (own_speed > 0){
-    if (own_direction_deg > (angle_global - 100) &&  own_direction_deg < (angle_global + 100)){
-      if (avoid_angle < alpha_vo && BB > 0){
-        printf("drone %d: inside \n", AC_ID);
-        if (d_oi < d_avo){
-          //if (row_zone == 1 || row_zone == 3 || row_zone == 4){
-            valueofdetection1 = 1;
-            printf("drone %d: avoid mode \n", AC_ID);
-            azimuth = angle_azimuth;
-            own_direction = own_direction_deg;
-            if (row_zone == 1){
-              printf("drone %d: same path\n",AC_ID);
-            }
-            else if(row_zone == 2){
-              printf("drone %d: converging left and has right of way\n",AC_ID);
-            }
-            else if(row_zone == 3){
-              printf("drone %d: head on\n",AC_ID);
-            }
-            else if(row_zone == 3){
-              printf("drone %d: head on\n",AC_ID);
-            }
-            else if(row_zone == 4){
-              printf("drone %d: converging right\n",AC_ID);
-            }
-            return(1);
-          //}
-        }
-        else{
-          printf("drone %d: collide soon\n",AC_ID);
-        }
-      }
+  if (ownshipangle_rad > 0 && ownshipangle_rad <= 0.5*M_PI){
+    printf("drone%d: situation 1\n", AC_ID);
+    avoidsituation = 1;
+    ownshipangle2 = ownshipangle_rad;
+  }
+  else if(ownshipangle_rad > 0.5 && ownshipangle_rad <= M_PI){
+    printf("drone%d: situation 2\n", AC_ID);
+    avoidsituation = 2;
+    ownshipangle2 = ownshipangle_rad - 0.5 * M_PI;
+  }
+  else if(ownshipangle_rad <= -0.5*M_PI && ownshipangle_rad > -1* M_PI){
+    printf("drone%d: situation 3\n", AC_ID);
+    avoidsituation = 3;
+    ownshipangle2 = ownshipangle_rad +  M_PI;
+  }
+  else if(ownshipangle_rad <= 0 && ownshipangle_rad > -0.5*M_PI){
+    printf("drone%d: situation 4\n", AC_ID);
+    avoidsituation = 4;
+    ownshipangle2 = ownshipangle_rad + 0.5 * M_PI;
+  }
+  else{
+    printf("drone%d: no decision\n", AC_ID);
+  }
+
+  float beta = ownshipangle2 + lala;
+
+  if (beta < 0.5*M_PI){
+    printf("drone%d: situation A\n", AC_ID);
+
+    *x_inc = sin(beta)*d_avot;
+    *y_inc = cos(beta)*d_avot;
+    if(avoidsituation == 1){
+      *x_inc = *x_inc;
+      *y_inc = *y_inc;
+    }
+    else if(avoidsituation == 2){
+      *x_inc = *x_inc;
+      *y_inc = -1*(*y_inc);
+    }
+    else if(avoidsituation == 3){
+      *x_inc = -1*(*x_inc);
+      *y_inc = -1*(*y_inc);
+    }
+    else if(avoidsituation == 4){
+      *x_inc = -1*(*x_inc);
+      *y_inc = *y_inc;
     }
   }
-} */
+  else if(beta == 0.5*M_PI){
+    printf("drone%d: situation A\n", AC_ID);
+    if(avoidsituation == 1){
+      *x_inc = -2*rpz;
+      *y_inc = 0;
+    }
+    else if(avoidsituation == 2){
+      *x_inc = 0;
+      *y_inc = -2*rpz;
+    }
+    else if(avoidsituation == 3){
+      *x_inc = 2*rpz;
+      *y_inc = 0;
+    }
+    else if(avoidsituation == 4){
+      *x_inc = 0;
+      *y_inc = 2*rpz;
+    }
+  }
+  else if(beta > 0.5*M_PI){
+    printf("drone%d: situation C\n", AC_ID);
+    float gamma = M_PI - beta;
+    *x_inc = cos(gamma)*d_avot;
+    *y_inc = sin(gamma)*d_avot;
+    if(avoidsituation == 1){
+      *x_inc = (*x_inc);
+      *y_inc = -1*(*y_inc);
+    }
+    else if(avoidsituation == 2){
+      *x_inc = -1*(*x_inc);
+      *y_inc = -1*(*y_inc);
+    }
+    else if(avoidsituation == 3){
+      *x_inc = -1*(*x_inc);
+      *y_inc = (*y_inc);
+    }
+    else if(avoidsituation == 4){
+      *x_inc = (*x_inc);
+      *y_inc = (*y_inc);
+    }
+  }
+}
+
+//void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float* y_inc){
+//  *x_inc = lala;
+//}
