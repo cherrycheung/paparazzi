@@ -7,7 +7,7 @@
   <waypoints>
     <waypoint name="CLIMB" x="1.2" y="-0.6"/>
     <waypoint name="TD" x="0.8" y="-1.7"/>
-    <waypoint name="HOME" x="-1.0" y="0.0"/>
+    <waypoint name="HOME" x="0.0" y="0.0"/>
     <waypoint name="p1" x="-2.0" y="-2.0"/>
     <waypoint name="p2" x="3.0" y="0.0"/>
     <waypoint name="p3" x="0.5" y="-1.0"/>

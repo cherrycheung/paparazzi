@@ -37,6 +37,25 @@ struct aTest {
 extern struct aTest Test;
 
 #endif*/
+#ifndef _LISTH_
+#define _LISTH_
+
+struct uav {
+  float pos_x;
+  float pos_y;
+  float speed;
+  float direction;
+};
+
+extern struct uav ownship;
+extern struct uav intruder;
+
+#endif
+
+int function_init();
+void getOwnship();
+void getIntruder();
+void getRelative();
 
 extern int avoid_detection1(void);
 float calcGlobalAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery);
@@ -44,7 +63,7 @@ float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float i
 void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float* y_inc);
 extern int avoid_navigation1(uint8_t wpb);
 extern int safe_setting1(void);
-void testtest();
+
 
 extern int valueofdetection1;
 extern int valueofnavigation1;
@@ -54,3 +73,5 @@ extern float new_waypoint_y;
 extern float angle_azimuth;
 extern float own_direction_deg;
 extern float testvalue;
+extern int simulation;
+extern int ac_id2;
