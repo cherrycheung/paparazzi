@@ -30,6 +30,10 @@
       <arg flag="-m" constant="SimpleHTTPServer"/>
       <arg flag="8889"/>
     </program>
+    <program name="Joystick" command="sw/ground_segment/joystick/input2ivy">
+      <arg flag="-ac" constant="@AIRCRAFT"/>
+      <arg flag="xbox_gamepad.xml"/>
+    </program>
     <program name="Attitude Visualizer" command="sw/tools/attitude_viz.py"/>
     <program name="App Server" command="sw/ground_segment/tmtc/app_server"/>
     <program name="NatNet" command="sw/ground_segment/misc/natnet2ivy"/>
@@ -39,6 +43,27 @@
     </program>
   </section>
   <section name="sessions">
+    <session name="Opti Multiflight - with Joystick">
+      <program name="Joystick">
+        <arg flag="-d" constant="1"/>
+        <arg flag="-ac" constant="ARDrone2_CHERRY3"/>
+        <arg flag="hobbyking.xml"/>
+      </program>
+      <program name="Server">
+        <arg flag="-n"/>
+      </program>
+      <program name="GCS"/>
+      <program name="Data Link">
+        <arg flag="-udp"/>
+      </program>
+      <program name="NatNet">
+        <arg flag="-ac" constant="3"/>
+        <arg flag="3"/>
+        <arg flag="-ac" constant="4"/>
+        <arg flag="4"/>
+      </program>
+      <program name="Messages"/>
+    </session>
     <session name="Messages and Settings">
       <program name="Data Link">
         <arg flag="-d" constant="/dev/ttyUSB0"/>
@@ -59,7 +84,6 @@
       <program name="GCS"/>
       <program name="Data Link">
         <arg flag="-udp"/>
-        <arg flag="-udp_broadcast"/>
       </program>
       <program name="NatNet">
         <arg flag="-ac" constant="3"/>
@@ -68,6 +92,24 @@
         <arg flag="4"/>
       </program>
       <program name="Messages"/>
+    </session>
+    <session name="Simulation - 2UAV no logs">
+      <program name="Simulator">
+        <arg flag="-a" constant="ARDrone2_CHERRY3SIM"/>
+        <arg flag="-t" constant="nps"/>
+      </program>
+      <program name="GCS"/>
+      <program name="Server">
+        <arg flag="-n"/>
+      </program>
+      <program name="Data Link">
+        <arg flag="-udp"/>
+        <arg flag="-udp_broadcast"/>
+      </program>
+      <program name="Simulator">
+        <arg flag="-a" constant="ARDrone2_CHERRY4SIM"/>
+        <arg flag="-t" constant="nps"/>
+      </program>
     </session>
   </section>
 </control_panel>
