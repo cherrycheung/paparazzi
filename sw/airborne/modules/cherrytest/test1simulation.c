@@ -20,6 +20,8 @@
  *
  */
 
+/*he;p*/
+
 #include <stdio.h>
 #include <std.h>
 #include <stdlib.h>
