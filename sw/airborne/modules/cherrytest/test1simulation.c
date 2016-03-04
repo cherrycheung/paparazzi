@@ -20,8 +20,6 @@
  *
  */
 
-/*he;p*/
-
 #include <stdio.h>
 #include <std.h>
 #include <stdlib.h>
@@ -125,6 +123,8 @@ void getRelative(){
   calcGlobalAzimuth(ownship.pos_x, ownship.pos_y, intruder.pos_x, intruder.pos_y, ownship.direction, &relative.global_o, &relative.azimuth_o);
   calcGlobalAzimuth(intruder.pos_x, intruder.pos_y, ownship.pos_x, ownship.pos_y, intruder.direction, &relative.global_i, &relative.azimuth_i);
   printf("drone%d: relative distance %f\n",AC_ID,relative.distance);
+  //printf("drone%d: positions o x y %f %f i x y %f %f\n",ownship.id,ownship.pos_x, ownship.pos_y, intruder.pos_y, intruder.pos_y);
+  //printf("drone%d: speeds o x y %f %f i x y %f %f\n",ownship.id,ownship.speed_x, ownship.speed_y, intruder.speed_x, intruder.speed);
 }
 
 int avoid_detection1(){ // will become the relative function
@@ -135,24 +135,39 @@ int avoid_detection1(){ // will become the relative function
 
   calcAvoidanceDist(init.avoidance, init.rpz, ownship.direction, &d_avo, &new_waypoint_x, &new_waypoint_y);
   printf("drone%d: avoiding from a distance %f\n",ownship.id,d_avo);
-  printf("drone%d: positions o x y %f %f i x y \n",ownship.id,ownship.pos_x, ownship.pos_y, intruder.pos_y, intruder.pos_y);
-
+  //printf("drone%d: positions o x y %f %f i x y \n",ownship.id,ownship.pos_x, ownship.pos_y, intruder.pos_y, intruder.pos_y);
   // Avoidance module
   float d_vo = (relative.distance*relative.distance - init.rpz*init.rpz)/relative.distance;
   float r_vo = init.rpz*((sqrt(relative.distance*relative.distance - init.rpz*init.rpz))/relative.distance);
   float alpha_vo = atan(r_vo/d_vo);
-  float DD_vo[2];
+
+  float Rx = ownship.speed_x - intruder.speed_x;
+  float Ry = ownship.speed_y - intruder.speed_y;
+  float R = sqrt(Rx*Rx + Ry*Ry);
+
+
+  float delta = atan(Rx/Ry);
+  float gamma = (delta - relative.global_o);
+  if (gamma > 0){
+    printf("right side\n");
+  }
+  else{
+    printf("left side\n");
+  }
+
+  printf("drone%d:Rx Ry %f %f delta %f global %f gamma %f\n",ownship.id,Rx,Ry,delta, relative.global_o,gamma);
+  /*float DD_vo[2];
   DD_vo[0] = intruder.pos_x - ownship.pos_x;
   DD_vo[1] = intruder.pos_y - ownship.pos_y;
   float AA = (ownship.speed_x - intruder.speed_x) * DD_vo[0] + (ownship.speed_y - intruder.speed_y)*DD_vo[1];
   float AAA = sqrt(powf((ownship.speed_x - intruder.speed_x),2)+powf((ownship.speed_y - intruder.speed_y),2))*d_vo;
   float BB = AA/AAA;
-  float beta_vo = acos(BB);
+  float beta_vo = acos(BB);*/
 
   /*printf("drone%d: ownship speed x y %f %f azimuth %f\n", ownship.id, ownship.speed_x, ownship.speed_y,relative.azimuth);
   printf("drone%d: intruder speed x y %f %f \n",ownship.id, intruder.speed_x, intruder.speed_y);
   printf("drone%d: d_vo %f r_vo %f  DD_vo[0] %f DD_vo[1] %f AA %f AAA %f\n" , ownship.id, d_vo, r_vo, DD_vo[0], DD_vo[1], AA, AAA);*/
-  printf("drone%d: beta_vo %f alpha_vo %f BB %f\n", ownship.id, beta_vo, alpha_vo, BB);
+  //printf("drone%d: beta_vo %f alpha_vo %f BB %f\n", ownship.id, beta_vo, alpha_vo, BB);
 
   // Right of way
   int row_zone;
@@ -174,17 +189,17 @@ int avoid_detection1(){ // will become the relative function
       row_zone = 4;
     }
   }
-  printf("drone%d: rowzone %d\n", ownship.id, row_zone);
+  //printf("drone%d: rowzone %d\n", ownship.id, row_zone);
 
 
   if (relative.distance > init.rpz){
-    if (relative.distance < d_avo * 1.2){
-      printf("drone%d: smaller than d_avo \n", ownship.id);
-      if(beta_vo < alpha_vo && BB > 0){
-        printf("drone%d: inside VO \n", ownship.id);
+    if(gamma < alpha_vo){
+      printf("drone%d: inside VO but not close enough\n", ownship.id);
+      if (relative.distance < d_avo * 1.2){
+        printf("drone%d: smaller than d_avo and inside VO\n", ownship.id);
         if(userow == 0){
           valueofdetection1 = 1;
-          printf("drone%d: YUP \n", ownship.id);
+          printf("drone%d: AVOID \n", ownship.id);
         }
         else if (userow == 1){
           if (row_zone == 1 || row_zone == 3 || row_zone == 4){
