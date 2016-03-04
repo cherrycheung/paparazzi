@@ -9,8 +9,8 @@
   <header>
     <file name="test1simulation.h"/>
   </header>
-    <periodic fun="avoid_detection1()" freq="3." autorun="FALSE"/>
-    <periodic fun="getRelative()" freq="1." autorun="TRUE"/>
+    <periodic fun="avoid_detection1()" freq="1." autorun="FALSE"/>
+    <periodic fun="getRelative()" freq="1." autorun="FALSE"/>
   <makefile>
     <file name="test1simulation.c"/>
   </makefile>

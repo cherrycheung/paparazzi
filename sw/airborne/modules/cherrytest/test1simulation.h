@@ -55,8 +55,10 @@ extern struct uav intruder;
 
 struct data {
   float distance;
-  float global;
-  float azimuth;
+  float global_o;
+  float global_i;
+  float azimuth_o;
+  float azimuth_i;
 };
 
 extern struct data relative;
