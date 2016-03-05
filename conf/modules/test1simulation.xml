@@ -1,0 +1,17 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="test1simulation" dir="cherrytest">
+  <doc>
+    <description>
+	Cherry's module
+    </description>
+  </doc>
+  <header>
+    <file name="test1simulation.h"/>
+  </header>
+    <periodic fun="avoid_detection1()" freq="1." autorun="FALSE"/>
+    <periodic fun="getRelative()" freq="1." autorun="TRUE"/>
+  <makefile>
+    <file name="test1simulation.c"/>
+  </makefile>
+</module>
