@@ -133,8 +133,7 @@ int avoid_detection1(){ // will become the relative function
   init.factor = 1.0;
   init.avoidance = 45.0/180.0 * M_PI;
 
-  calcAvoidanceDist(init.avoidance, init.rpz, ownship.direction, &d_avo, &new_waypoint_x, &new_waypoint_y);
-  printf("drone%d: avoiding from a distance %f\n",ownship.id,d_avo);
+
   //printf("drone%d: positions o x y %f %f i x y \n",ownship.id,ownship.pos_x, ownship.pos_y, intruder.pos_y, intruder.pos_y);
   // Avoidance module
   float d_vo = (relative.distance*relative.distance - init.rpz*init.rpz)/relative.distance;
@@ -143,19 +142,33 @@ int avoid_detection1(){ // will become the relative function
 
   float Rx = ownship.speed_x - intruder.speed_x;
   float Ry = ownship.speed_y - intruder.speed_y;
-  float R = sqrt(Rx*Rx + Ry*Ry);
-
-
-  float delta = atan(Rx/Ry);
-  float gamma = (delta - relative.global_o);
-  if (gamma > 0){
-    printf("right side\n");
+  float delta;
+  float gamma;
+  if (Rx >= 0 && Ry >= 0){
+    delta = atan(Rx/Ry);
+    gamma = (delta - relative.global_o);
+    printf("zone1\n");
+  }
+  else if(Rx > 0 && Ry < 0){
+    delta = 0.5*M_PI + atan(Rx/((-1)*Ry));
+    gamma = (delta - relative.global_o);
+    printf("zone2\n");
+  }
+  else if(Rx < 0 && Ry < 0){
+    delta = 0.5*M_PI + atan(Rx/Ry);
+    gamma = (delta - (-1)*relative.global_o);
+    printf("zone3\n");
   }
   else{
-    printf("left side\n");
+    delta = atan((-1*Rx)/Ry);
+    gamma = (delta - (-1)*relative.global_o);
+    printf("zone4\n");
   }
 
   printf("drone%d:Rx Ry %f %f delta %f global %f gamma %f\n",ownship.id,Rx,Ry,delta, relative.global_o,gamma);
+  calcAvoidanceDist(init.avoidance, init.rpz, ownship.direction, &d_avo, &new_waypoint_x, &new_waypoint_y);
+  printf("drone%d: avoiding from a distance %f\n",ownship.id,d_avo);
+
   /*float DD_vo[2];
   DD_vo[0] = intruder.pos_x - ownship.pos_x;
   DD_vo[1] = intruder.pos_y - ownship.pos_y;
@@ -193,7 +206,7 @@ int avoid_detection1(){ // will become the relative function
 
 
   if (relative.distance > init.rpz){
-    if(gamma < alpha_vo){
+    if(abs(gamma) < alpha_vo){
       printf("drone%d: inside VO but not close enough\n", ownship.id);
       if (relative.distance < d_avo * 1.2){
         printf("drone%d: smaller than d_avo and inside VO\n", ownship.id);
@@ -363,7 +376,7 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
     avoidsituation = 1;
     ownshipangle2 = ownshipangle_rad;
   }
-  else if(ownshipangle_rad > 0.5 && ownshipangle_rad <= M_PI){
+  else if(ownshipangle_rad > 0.5*M_PI && ownshipangle_rad <= M_PI){
     //printf("drone%d: situation 2\n", AC_ID);
     avoidsituation = 2;
     ownshipangle2 = ownshipangle_rad - 0.5 * M_PI;
@@ -385,31 +398,38 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
   float beta = ownshipangle2 + lala;
 
   if (beta < 0.5*M_PI){
-    *x_inc = sin(beta)*d_avot;
-    *y_inc = cos(beta)*d_avot;
+
     if(avoidsituation == 1){
       //printf("111");
+      *x_inc = sin(beta)*d_avot;
+      *y_inc = cos(beta)*d_avot;
       *x_inc = *x_inc*1.2;
       *y_inc = *y_inc*1.2;
     }
     else if(avoidsituation == 2){
-      //printf("112");
+      //printf("112 ownshipangle 2 %f lala %f beta %f",ownshipangle2/M_PI*180, lala/M_PI*180, beta/M_PI*180);
+      *x_inc = cos(beta)*d_avot;
+      *y_inc = sin(beta)*d_avot;
       *x_inc = *x_inc*1.2;
       *y_inc = -1*(*y_inc)*1.2;
     }
     else if(avoidsituation == 3){
       //printf("113");
+      *x_inc = sin(beta)*d_avot;
+      *y_inc = cos(beta)*d_avot;
       *x_inc = -1*(*x_inc)*1.2;
       *y_inc = -1*(*y_inc)*1.2;
     }
     else if(avoidsituation == 4){
       //printf("114");
+      *x_inc = cos(beta)*d_avot;
+      *y_inc = sin(beta)*d_avot;
       *x_inc = -1*(*x_inc)*1.2;
       *y_inc = *y_inc*1.2;
     }
   }
   else if(beta == 0.5*M_PI){
-    //printf("drone%d: situation A\n", AC_ID);
+    printf("drone%d: situation A\n", AC_ID);
     if(avoidsituation == 1){
       //printf("121");
       *x_inc = -2*rpz*1.2;
@@ -432,7 +452,7 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
     }
   }
   else if(beta > 0.5*M_PI){
-    //printf("drone%d: situation C\n", AC_ID);
+    printf("drone%d: situation C\n", AC_ID);
     float gamma = M_PI - beta;
     if(avoidsituation == 1){
       //printf("131 %f %f %f %f %f %f\n",ownshipangle2, lala, beta,gamma, *x_inc, *y_inc);
