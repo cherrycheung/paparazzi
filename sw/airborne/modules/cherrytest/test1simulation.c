@@ -103,7 +103,7 @@ void getIntruder(int carrot){
     intruder.pos_y = intr.north/100-5760891.52;;
   }
 
-  printf("intruder%d: angle %f\n",intruder.id, intr.course);
+  printf("intruder%d: angle %f pos x %f pos y %f \n",intruder.id, intr.course, intruder.pos_x, intruder.pos_y);
   if (intr.course > M_PI){
     intruder.direction = intr.course - 2*M_PI;
   }
