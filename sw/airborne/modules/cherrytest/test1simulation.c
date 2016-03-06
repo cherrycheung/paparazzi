@@ -95,25 +95,24 @@ void getIntruder(int carrot){
   struct ac_info_ intr = *ac;
 
   if (carrot == 1){
-    intruder.pos_x = intr.utm.east- 594534.8125;
-    intruder.pos_y = intr.utm.north - 5760891.500;
+    intruder.pos_x = (intr.utm.east-59453483)/100.00;//- 594534.8125;
+    intruder.pos_y = (intr.utm.north-576089149)/100.00;// - 5760891.500;
   }
   else if(carrot == 0){
-    intruder.pos_x = intr.utm.east/100-594534.84;
-    intruder.pos_y = intr.utm.north/100-5760891.52;;
+    intruder.pos_x = intr.utm.east/100.-594534.83;
+    intruder.pos_y = intr.utm.north/100.-5760891.49;
   }
-
-  printf("intruder%d: angle %f pos x %f pos y %f \n",intruder.id, intr.course, intruder.pos_x, intruder.pos_y);
-  if (intr.course > M_PI){
-    intruder.direction = intr.course - 2*M_PI;
+  if (intr.course > 1800 && intr.course < 3601){
+    intruder.direction = (intr.course/10.0)/180*M_PI - 2*M_PI;
   }
   else{
-    intruder.direction = intr.course;
+    intruder.direction = (intr.course/10.0)/180*M_PI;
   }
 
-  intruder.speed_x = cos((intr.course)*-1 + 0.5*M_PI)*intr.gspeed;
-  intruder.speed_y = sin((intr.course)*-1 + 0.5*M_PI)*intr.gspeed;
+  intruder.speed_x = cos(intruder.direction)*(intr.gspeed/100.0);
+  intruder.speed_y = sin(intruder.direction)*(intr.gspeed/100.0);
   intruder.speed = sqrt(intruder.speed_x * intruder.speed_x)+(intruder.speed_y * intruder.speed_y);
+  //printf("intruder%d: intruder.direction %f speed x y %f %f\n",intruder.id, intruder.direction, intruder.speed_x,intruder.speed_y);
 }
 
 void getRelative(){
@@ -229,7 +228,6 @@ int avoid_detection1(){ // will become the relative function
   }
   return(0);
 }
-
 
 int avoid_navigation1(uint8_t wpb){
   float avoid_x = new_waypoint_x;

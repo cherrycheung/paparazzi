@@ -57,6 +57,7 @@ extern void waypoints_init(void);
 extern bool_t waypoint_is_global(uint8_t wp_id);
 extern void waypoint_set_global_flag(uint8_t wp_id);
 extern void waypoint_clear_global_flag(uint8_t wp_id);
+extern void waypoint_set_cherry(uint8_t wp_id, float x_new, float y_new);
 
 
 /*

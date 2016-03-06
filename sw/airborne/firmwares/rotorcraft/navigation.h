@@ -109,6 +109,7 @@ extern bool_t nav_set_heading_current(void);
 #define NavSetAltitudeReferenceHere() ({ nav_reset_alt(); FALSE; })
 
 #define NavSetWaypointHere(_wp) ({ waypoint_set_here_2d(_wp); FALSE; })
+#define NavCherry(_wp2,x_inc,y_inc) ({ waypoint_set_cherry(_wp2,x_inc,y_inc); FALSE; })
 #define NavCopyWaypoint(_wp1, _wp2) ({ waypoint_copy(_wp1, _wp2); FALSE; })
 #define NavCopyWaypointPositionOnly(_wp1, _wp2) ({ waypoint_position_copy(_wp1, _wp2); FALSE; })
 
