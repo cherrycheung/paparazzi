@@ -208,6 +208,7 @@ STATIC_INLINE void main_init(void)
 
   autopilot_init();
 
+
   modules_init();
 
   settings_init();

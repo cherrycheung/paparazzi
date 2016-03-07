@@ -184,7 +184,7 @@ int avoid_detection1(){ // will become the relative function
   //printf("drone%d: beta_vo %f alpha_vo %f BB %f\n", ownship.id, beta_vo, alpha_vo, BB);
 
   // Right of way
-  int row_zone;
+  int row_zone =0;
   if(userow == 1){
     float row_angle = (intruder.direction - ownship.direction)/M_PI * 180;
     if (row_angle >= -45 && row_angle <= 45){
@@ -230,17 +230,16 @@ int avoid_detection1(){ // will become the relative function
   return(0);
 }
 
-/*static void send_cherry(struct transport_tx *trans, struct link_device *dev)
+static void send_cherry(struct transport_tx *trans, struct link_device *dev)
 {
-  float ownship_posx = ownship.pos_x;
-  pprz_msg_send_cherry(trans, dev, AC_ID,
-                            &ownship_posx);
+  pprz_msg_send_CHERRY(trans, dev, AC_ID,
+                            &ownship.pos_x);
 }
 
 void cherry_init(void)
 {
   register_periodic_telemetry(DefaultPeriodic, PPRZ_MSG_ID_CHERRY, send_cherry);
-}*/
+}
 
 int avoid_navigation1(uint8_t wpb){
   float avoid_x = new_waypoint_x;
@@ -258,8 +257,6 @@ return 0;
 }
 
 void calcGlobalAzimuth(float ownshipx, float ownshipy, float intruderx, float intrudery, float ownshipangle, float* global_angle1, float* azimuth_angle){
-  *global_angle1;
-  *azimuth_angle;
   if(intrudery > ownshipy){ // situation 1
     if(intruderx == ownshipx){ // situation A
       *global_angle1 = 0;
@@ -380,8 +377,8 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
   *d_avo1 = rpz/sin(lala);
   float d_avo2 = *d_avo1 * tan(lala);
   float d_avot = sqrt((*d_avo1)*(*d_avo1) + d_avo2*d_avo2);
-  int avoidsituation;
-  float ownshipangle2;
+  int avoidsituation =0;
+  float ownshipangle2 = 0;
 
   if (ownshipangle_rad > 0 && ownshipangle_rad <= 0.5*M_PI){
     //printf("drone%d: situation 1\n", AC_ID);

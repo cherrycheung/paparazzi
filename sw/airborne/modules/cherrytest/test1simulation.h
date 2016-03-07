@@ -79,6 +79,7 @@ void getIntruder();
 void getRelative();
 
 extern int avoid_detection1(void);
+extern void cherry_init(void);
 void calcGlobalAzimuth(float ownshipx, float ownshipy, float intruderx, float intrudery, float ownshipangle, float* global_angle1, float* azimuth_angle);
 float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
 void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float* y_inc);
