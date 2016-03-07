@@ -2219,6 +2219,10 @@
     <field name="V_Down" type="double"/>
   </message>
 
+   <!--message name="CHERRY" id="256">
+    <field name="ownship_posx" type="float" unit="m"/>
+  </message-->
+
 </msg_class>
 
 

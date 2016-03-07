@@ -37,6 +37,7 @@
 #include "subsystems/ins.h"
 #include "math/pprz_geodetic_float.h"
 #include "math/pprz_geodetic_int.h"
+#include "subsystems/datalink/telemetry.h"
 
 int valueofdetection1 = 0;
 int valueofnavigation1 = 0;
@@ -228,6 +229,18 @@ int avoid_detection1(){ // will become the relative function
   }
   return(0);
 }
+
+/*static void send_cherry(struct transport_tx *trans, struct link_device *dev)
+{
+  float ownship_posx = ownship.pos_x;
+  pprz_msg_send_cherry(trans, dev, AC_ID,
+                            &ownship_posx);
+}
+
+void cherry_init(void)
+{
+  register_periodic_telemetry(DefaultPeriodic, PPRZ_MSG_ID_CHERRY, send_cherry);
+}*/
 
 int avoid_navigation1(uint8_t wpb){
   float avoid_x = new_waypoint_x;
