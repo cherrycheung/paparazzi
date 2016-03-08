@@ -123,9 +123,9 @@ void getRelative(){
   relative.distance = sqrt(powf((ownship.pos_x - intruder.pos_x),2) + powf((ownship.pos_y - intruder.pos_y),2));
   calcGlobalAzimuth(ownship.pos_x, ownship.pos_y, intruder.pos_x, intruder.pos_y, ownship.direction, &relative.global_o, &relative.azimuth_o);
   calcGlobalAzimuth(intruder.pos_x, intruder.pos_y, ownship.pos_x, ownship.pos_y, intruder.direction, &relative.global_i, &relative.azimuth_i);
-  printf("drone%d: relative distance %f\n",AC_ID,relative.distance);
-  //printf("drone%d: positions o x y %f %f i x y %f %f\n",ownship.id,ownship.pos_x, ownship.pos_y, intruder.pos_y, intruder.pos_y);
-  //printf("drone%d: speeds o x y %f %f i x y %f %f\n",ownship.id,ownship.speed_x, ownship.speed_y, intruder.speed_x, intruder.speed);
+  printf("drone%d: relative distance %f own direction %f\n",AC_ID,relative.distance,ownship.direction/M_PI*180.0);
+  printf("drone%d: positions o x y %f %f i x y %f %f\n",ownship.id,ownship.pos_x, ownship.pos_y, intruder.pos_x, intruder.pos_y);
+  printf("drone%d: speeds o x y %f %f i x y %f %f\n",ownship.id,ownship.speed_x, ownship.speed_y, intruder.speed_x, intruder.speed);
 }
 
 int avoid_detection1(){ // will become the relative function
