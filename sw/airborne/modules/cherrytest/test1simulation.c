@@ -113,7 +113,6 @@ void getIntruder(int carrot){
   intruder.speed_x = cos(intruder.direction)*(intr.gspeed/100.0);
   intruder.speed_y = sin(intruder.direction)*(intr.gspeed/100.0);
   intruder.speed = sqrt(intruder.speed_x * intruder.speed_x)+(intruder.speed_y * intruder.speed_y);
-  //printf("intruder%d: intruder.direction %f speed x y %f %f\n",intruder.id, intruder.direction, intruder.speed_x,intruder.speed_y);
 }
 
 void getRelative(){
@@ -123,19 +122,14 @@ void getRelative(){
   relative.distance = sqrt(powf((ownship.pos_x - intruder.pos_x),2) + powf((ownship.pos_y - intruder.pos_y),2));
   calcGlobalAzimuth(ownship.pos_x, ownship.pos_y, intruder.pos_x, intruder.pos_y, ownship.direction, &relative.global_o, &relative.azimuth_o);
   calcGlobalAzimuth(intruder.pos_x, intruder.pos_y, ownship.pos_x, ownship.pos_y, intruder.direction, &relative.global_i, &relative.azimuth_i);
-  printf("drone%d: relative distance %f own direction %f\n",AC_ID,relative.distance,ownship.direction/M_PI*180.0);
-  printf("drone%d: positions o x y %f %f i x y %f %f\n",ownship.id,ownship.pos_x, ownship.pos_y, intruder.pos_x, intruder.pos_y);
-  printf("drone%d: speeds o x y %f %f i x y %f %f\n",ownship.id,ownship.speed_x, ownship.speed_y, intruder.speed_x, intruder.speed);
 }
 
-int avoid_detection1(){ // will become the relative function
+int avoid_detection1(){
   int userow = 1; // 1 for row
   init.rpz = 1.0;
   init.factor = 1.0;
   init.avoidance = 45.0/180.0 * M_PI;
 
-
-  //printf("drone%d: positions o x y %f %f i x y \n",ownship.id,ownship.pos_x, ownship.pos_y, intruder.pos_y, intruder.pos_y);
   // Avoidance module
   float d_vo = (relative.distance*relative.distance - init.rpz*init.rpz)/relative.distance;
   float r_vo = init.rpz*((sqrt(relative.distance*relative.distance - init.rpz*init.rpz))/relative.distance);
@@ -148,63 +142,31 @@ int avoid_detection1(){ // will become the relative function
   if (Rx >= 0 && Ry >= 0){
     delta = atan(Rx/Ry);
     gamma = (delta - relative.global_o);
-    printf("zone1\n");
   }
   else if(Rx > 0 && Ry < 0){
     delta = 0.5*M_PI + atan(Rx/((-1)*Ry));
     gamma = (delta - relative.global_o);
-    printf("zone2\n");
   }
   else if(Rx < 0 && Ry < 0){
     delta = 0.5*M_PI + atan(Rx/Ry);
     gamma = (delta - (-1)*relative.global_o);
-    printf("zone3\n");
   }
   else{
     delta = atan((-1*Rx)/Ry);
     gamma = (delta - (-1)*relative.global_o);
-    printf("zone4\n");
   }
+  //printf("drone%d: gamma %f alphavo %f \n",ownship.id,gamma,alpha_vo);
 
-  printf("drone%d:Rx Ry %f %f delta %f global %f gamma %f\n",ownship.id,Rx,Ry,delta, relative.global_o,gamma);
+
   calcAvoidanceDist(init.avoidance, init.rpz, ownship.direction, &d_avo, &new_waypoint_x, &new_waypoint_y);
-  printf("drone%d: avoiding from a distance %f\n",ownship.id,d_avo);
-
-  /*float DD_vo[2];
-  DD_vo[0] = intruder.pos_x - ownship.pos_x;
-  DD_vo[1] = intruder.pos_y - ownship.pos_y;
-  float AA = (ownship.speed_x - intruder.speed_x) * DD_vo[0] + (ownship.speed_y - intruder.speed_y)*DD_vo[1];
-  float AAA = sqrt(powf((ownship.speed_x - intruder.speed_x),2)+powf((ownship.speed_y - intruder.speed_y),2))*d_vo;
-  float BB = AA/AAA;
-  float beta_vo = acos(BB);*/
-
-  /*printf("drone%d: ownship speed x y %f %f azimuth %f\n", ownship.id, ownship.speed_x, ownship.speed_y,relative.azimuth);
-  printf("drone%d: intruder speed x y %f %f \n",ownship.id, intruder.speed_x, intruder.speed_y);
-  printf("drone%d: d_vo %f r_vo %f  DD_vo[0] %f DD_vo[1] %f AA %f AAA %f\n" , ownship.id, d_vo, r_vo, DD_vo[0], DD_vo[1], AA, AAA);*/
-  //printf("drone%d: beta_vo %f alpha_vo %f BB %f\n", ownship.id, beta_vo, alpha_vo, BB);
+  //printf("drone%d: avoiding from a distance %f\n",ownship.id,d_avo);
 
   // Right of way
-  int row_zone =0;
-  if(userow == 1){
-    float row_angle = (intruder.direction - ownship.direction)/M_PI * 180;
-    if (row_angle >= -45 && row_angle <= 45){
-      row_zone = 1;
-    }
-    else if(row_angle > 45 && row_angle < 136){
-      row_zone = 2;
-    }
-    else if(row_angle >= 136 && row_angle <= 180){
-      row_zone = 3;
-    }
-    else if(row_angle >= -180 && row_angle <= -136){
-      row_zone = 3;
-    }
-    else if(row_angle >= -135 && row_angle <= -46){
-      row_zone = 4;
-    }
+  int row_zone = 0;
+  if (userow == 1){
+	  calcROWzone(ownship.direction, intruder.direction, &row_zone);
+	  printf("userow done %d %f %f\n",row_zone, intruder.speed_y, ownship.speed_y);
   }
-  //printf("drone%d: rowzone %d\n", ownship.id, row_zone);
-
 
   if (relative.distance > init.rpz){
     if(abs(gamma) < alpha_vo){
@@ -218,27 +180,25 @@ int avoid_detection1(){ // will become the relative function
         else if (userow == 1){
           if (row_zone == 1 || row_zone == 3 || row_zone == 4){
             valueofdetection1 = 1;
-            printf("drone%d: no row, so action \n", ownship.id);
+            if (row_zone == 1){
+            	printf("drone%d: same path, NO ROW \n", ownship.id);
+            }
+            else if (row_zone == 3){
+            	printf("drone%d: head on, NO ROW \n", ownship.id);
+            }
+            else if (row_zone == 4){
+            	printf("drone%d: left converging, NO ROW \n", ownship.id);
+            }
+
           }
           else{
-            printf("drone%d: has the right of way so no action\n", ownship.id);
+        	  printf("drone%d: right converging, ROW \n", ownship.id);
           }
         }
       }
     }
   }
   return(0);
-}
-
-static void send_cherry(struct transport_tx *trans, struct link_device *dev)
-{
-  pprz_msg_send_CHERRY(trans, dev, AC_ID,
-                            &ownship.pos_x);
-}
-
-void cherry_init(void)
-{
-  register_periodic_telemetry(DefaultPeriodic, PPRZ_MSG_ID_CHERRY, send_cherry);
 }
 
 int avoid_navigation1(uint8_t wpb){
@@ -373,7 +333,6 @@ void calcGlobalAzimuth(float ownshipx, float ownshipy, float intruderx, float in
 }
 
 void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float* y_inc){
-  //printf("inside module %f %f %f\n",lala,rpz,ownshipangle_rad);
   *d_avo1 = rpz/sin(lala);
   float d_avo2 = *d_avo1 * tan(lala);
   float d_avot = sqrt((*d_avo1)*(*d_avo1) + d_avo2*d_avo2);
@@ -438,7 +397,6 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
     }
   }
   else if(beta == 0.5*M_PI){
-    printf("drone%d: situation A\n", AC_ID);
     if(avoidsituation == 1){
       //printf("121");
       *x_inc = -2*rpz*1.2;
@@ -461,7 +419,6 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
     }
   }
   else if(beta > 0.5*M_PI){
-    printf("drone%d: situation C\n", AC_ID);
     float gamma = M_PI - beta;
     if(avoidsituation == 1){
       //printf("131 %f %f %f %f %f %f\n",ownshipangle2, lala, beta,gamma, *x_inc, *y_inc);
@@ -492,4 +449,138 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
       *y_inc = (*y_inc)*1.2;
     }
   }
+}
+
+void calcROWzone(float odir, float idir, int* rowzone){
+	float ownshipdir;
+	float intruderdir;
+	float row_angle;
+	  if (odir > 0){
+		  ownshipdir = odir;
+	  }
+	  else {
+		  ownshipdir = odir + 2*M_PI;
+	  }
+
+	  if(idir > 0){
+		  intruderdir = idir;
+	  }
+	  else {
+		  intruderdir = idir + 2*M_PI;
+	  }
+
+	  row_angle = intruderdir - ownshipdir;
+
+	  if (ownshipdir >= 1.75*M_PI && ownshipdir < 0.25 * M_PI){
+		  printf("first case");
+		  if (row_angle < 0){
+			  row_angle = row_angle * -1;
+		  }
+		  if(row_angle >= 1.75*M_PI && row_angle < 0.25 * M_PI){
+			  *rowzone = 1;
+		  }
+		  else if(row_angle >= 0.25*M_PI && row_angle < 0.75*M_PI){
+			  *rowzone = 2;
+		  }
+		  else if(row_angle >= 0.75*M_PI && row_angle < 1.25*M_PI){
+			  *rowzone = 3;
+		  }
+		  else if(row_angle >= 1.25*M_PI & row_angle < 1.75*M_PI){
+			  *rowzone = 3;
+		  }
+	  }
+
+	  if (ownshipdir >= 0.25*M_PI && ownshipdir < 0.75*M_PI){
+		  printf("second case");
+		  if (row_angle < 0){
+			  row_angle = row_angle * -1;
+		  }
+		  if(row_angle >= 1.75*M_PI && row_angle < 0.25 * M_PI){
+			  *rowzone = 1;
+		  }
+		  else if(row_angle >= 0.25*M_PI && row_angle < 0.75*M_PI){
+			  if(intruder.speed_y < ownship.speed_y){
+				  *rowzone = 2;
+			  }
+			  else{
+				  *rowzone = 4;
+			  }
+
+		  }
+		  else if(row_angle >= 0.75*M_PI && row_angle < 1.25*M_PI){
+			  *rowzone = 3;
+		  }
+		  else if(row_angle >= 1.25*M_PI & row_angle < 1.75*M_PI){
+			  if(intruder.speed_y < ownship.speed_y){
+				  *rowzone = 2;
+			  }
+			  else{
+				  *rowzone = 4;
+			  }
+		  }
+	  }
+
+	  if (ownshipdir >= 0.75*M_PI && ownshipdir < 1.25*M_PI){
+		  printf("third case");
+		  if (row_angle < 0){
+			  row_angle = row_angle * -1;
+		  }
+		  if(row_angle >= 1.75*M_PI && row_angle < 0.25 * M_PI){
+			  *rowzone = 1;
+		  }
+		  else if(row_angle >= 0.25*M_PI && row_angle < 0.75*M_PI){
+			  if(intruder.speed_x < ownship.speed_x){
+				  *rowzone = 2;
+			  }
+			  else{
+				  *rowzone = 4;
+			  }
+
+		  }
+		  else if(row_angle >= 0.75*M_PI && row_angle < 1.25*M_PI){
+			  *rowzone = 3;
+		  }
+		  else if(row_angle >= 1.25*M_PI & row_angle < 1.75*M_PI){
+			  if(intruder.speed_x < ownship.speed_x){
+				  *rowzone = 2;
+			  }
+			  else{
+				  *rowzone = 4;
+			  }
+		  }
+	  }
+
+	  if (ownshipdir >= 1.25*M_PI && ownshipdir < 1.75*M_PI){
+		  printf("last case\n");
+	  		  if (row_angle < 0){
+	  			  row_angle = row_angle * -1;
+	  		  }
+	  		  if(row_angle >= 1.75*M_PI && row_angle < 0.25 * M_PI){
+	  			  *rowzone = 1;
+	  		  }
+	  		  else if(row_angle >= 0.25*M_PI && row_angle < 0.75*M_PI){
+	  			  printf("last case1\n");
+	  			  if(intruder.speed_y > ownship.speed_y){
+	  				  *rowzone = 2;
+	  			  }
+	  			  else if(intruder.speed_y < ownship.speed_y){
+	  				  printf("how %f %f\n", intruder.speed_y, ownship.speed_y);
+	  				  *rowzone = 4;
+	  			  }
+	  		  }
+	  		  else if(row_angle >= 0.75*M_PI && row_angle < 1.25*M_PI){
+	  			  *rowzone = 3;
+	  		  }
+	  		  else if(row_angle >= 1.25*M_PI & row_angle < 1.75*M_PI){
+	  			printf("last case2\n");
+	  			  if(intruder.speed_y > ownship.speed_y){
+	  				  *rowzone = 2;
+	  			  }
+	  			  else if(intruder.speed_y < ownship.speed_y){
+	  				printf("how %f %f\n", intruder.speed_y, ownship.speed_y);
+	  				  *rowzone = 4;
+	  			  }
+	  		  }
+	  	  }
+
 }
