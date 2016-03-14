@@ -124,6 +124,10 @@ void getRelative(){
   calcGlobalAzimuth(intruder.pos_x, intruder.pos_y, ownship.pos_x, ownship.pos_y, intruder.direction, &relative.global_i, &relative.azimuth_i);
 }
 
+void printStuff(){
+	printf("drone%d: relative distance %f \n",ownship.id,relative.distance);
+}
+
 int avoid_detection1(){
   int userow = 1; // 1 for row
   init.rpz = 1.0;
@@ -155,11 +159,9 @@ int avoid_detection1(){
     delta = atan((-1*Rx)/Ry);
     gamma = (delta - (-1)*relative.global_o);
   }
-  //printf("drone%d: gamma %f alphavo %f \n",ownship.id,gamma,alpha_vo);
 
 
   calcAvoidanceDist(init.avoidance, init.rpz, ownship.direction, &d_avo, &new_waypoint_x, &new_waypoint_y);
-  //printf("drone%d: avoiding from a distance %f\n",ownship.id,d_avo);
 
   // Right of way
   int row_zone = 0;
@@ -340,27 +342,20 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
   float ownshipangle2 = 0;
 
   if (ownshipangle_rad > 0 && ownshipangle_rad <= 0.5*M_PI){
-    //printf("drone%d: situation 1\n", AC_ID);
     avoidsituation = 1;
     ownshipangle2 = ownshipangle_rad;
   }
   else if(ownshipangle_rad > 0.5*M_PI && ownshipangle_rad <= M_PI){
-    //printf("drone%d: situation 2\n", AC_ID);
     avoidsituation = 2;
     ownshipangle2 = ownshipangle_rad - 0.5 * M_PI;
   }
   else if(ownshipangle_rad <= -0.5*M_PI && ownshipangle_rad > -1* M_PI){
-    //printf("drone%d: situation 3\n", AC_ID);
     avoidsituation = 3;
     ownshipangle2 = ownshipangle_rad +  M_PI;
   }
   else if(ownshipangle_rad <= 0 && ownshipangle_rad > -0.5*M_PI){
-    //printf("drone%d: situation 4\n", AC_ID);
     avoidsituation = 4;
     ownshipangle2 = ownshipangle_rad + 0.5 * M_PI;
-  }
-  else{
-    //printf("drone%d: no decision\n", AC_ID);
   }
 
   float beta = ownshipangle2 + lala;
@@ -368,28 +363,24 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
   if (beta < 0.5*M_PI){
 
     if(avoidsituation == 1){
-      //printf("111");
       *x_inc = sin(beta)*d_avot;
       *y_inc = cos(beta)*d_avot;
       *x_inc = *x_inc*1.2;
       *y_inc = *y_inc*1.2;
     }
     else if(avoidsituation == 2){
-      //printf("112 ownshipangle 2 %f lala %f beta %f",ownshipangle2/M_PI*180, lala/M_PI*180, beta/M_PI*180);
       *x_inc = cos(beta)*d_avot;
       *y_inc = sin(beta)*d_avot;
       *x_inc = *x_inc*1.2;
       *y_inc = -1*(*y_inc)*1.2;
     }
     else if(avoidsituation == 3){
-      //printf("113");
       *x_inc = sin(beta)*d_avot;
       *y_inc = cos(beta)*d_avot;
       *x_inc = -1*(*x_inc)*1.2;
       *y_inc = -1*(*y_inc)*1.2;
     }
     else if(avoidsituation == 4){
-      //printf("114");
       *x_inc = cos(beta)*d_avot;
       *y_inc = sin(beta)*d_avot;
       *x_inc = -1*(*x_inc)*1.2;
@@ -398,22 +389,18 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
   }
   else if(beta == 0.5*M_PI){
     if(avoidsituation == 1){
-      //printf("121");
       *x_inc = -2*rpz*1.2;
       *y_inc = 0;
     }
     else if(avoidsituation == 2){
-      //printf("122");
       *x_inc = 0;
       *y_inc = -2*rpz*1.2;
     }
     else if(avoidsituation == 3){
-      //printf("123");
       *x_inc = 2*rpz*1.2;
       *y_inc = 0;
     }
     else if(avoidsituation == 4){
-      //printf("124");
       *x_inc = 0;
       *y_inc = 2*rpz*1.2;
     }
@@ -421,28 +408,24 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
   else if(beta > 0.5*M_PI){
     float gamma = M_PI - beta;
     if(avoidsituation == 1){
-      //printf("131 %f %f %f %f %f %f\n",ownshipangle2, lala, beta,gamma, *x_inc, *y_inc);
       *x_inc = sin(gamma)*d_avot;
       *y_inc = cos(gamma)*d_avot;
       *x_inc = (*x_inc)*1.2;
       *y_inc = -1*(*y_inc)*1.2;
     }
     else if(avoidsituation == 2){
-      //printf("132");
       *x_inc = cos(gamma)*d_avot;
       *y_inc = sin(gamma)*d_avot;
       *x_inc = -1*(*x_inc)*1.2;
       *y_inc = -1*(*y_inc)*1.2;
     }
     else if(avoidsituation == 3){
-      //printf("133");
       *x_inc = sin(gamma)*d_avot;
       *y_inc = cos(gamma)*d_avot;
       *x_inc = -1*(*x_inc)*1.2;
       *y_inc = (*y_inc)*1.2;
     }
     else if(avoidsituation == 4){
-      //printf("134");
       *x_inc = cos(gamma)*d_avot;
       *y_inc = sin(gamma)*d_avot;
       *x_inc = (*x_inc)*1.2;
@@ -453,6 +436,22 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
 
 void calcROWzone(float odir, float idir, int* rowzone){
   float boundaries[4];
+  float midboundaries[4];
+  
+  if(odir > 2*M_PI){
+	  odir = odir - 2*M_PI;
+  }
+  else if(odir < 0){
+	  odir = odir + 2*M_PI;
+  }
+  if(idir > 2*M_PI){
+	  idir = idir - 2*M_PI;
+  }
+  else if(idir < 0){
+	  idir = idir + 2*M_PI;
+  }
+  
+  
   boundaries[0] = odir - 0.25*M_PI;
   if(boundaries[0] > 2*M_PI){
     boundaries[0] = boundaries[0] - 2*M_PI;
@@ -484,54 +483,165 @@ void calcROWzone(float odir, float idir, int* rowzone){
   else if(boundaries[3] < 0){
     boundaries[3] = boundaries[3] + 2*M_PI;
   }
-float xx = odir - 0.75*M_PI+2*M_PI;
-  if(idir < 0.5*M_PI){
-    if(boundaries[0] == xx){
-	*rowzone = 1;
-    }
-    if(boundaries[1] == xx){
-	*rowzone = 2;
-    }
-    if(boundaries[2] == xx){
-	*rowzone = 3;
-    }
-    if(boundaries[3] == xx){
-	*rowzone = 4;
-    }
+  
+  midboundaries[0] = odir;
+  midboundaries[1] = midboundaries[0] + 0.5*M_PI;
+  if(midboundaries[1] > 2*M_PI){
+	  midboundaries[1] = midboundaries[1] - 2*M_PI;
+  }
+  else if(boundaries[1] < 0){
+	  midboundaries[1] = midboundaries[1] + 2*M_PI;
+  }
+  midboundaries[2] = midboundaries[1] + 0.5*M_PI;
+  if(midboundaries[2] > 2*M_PI){
+	  midboundaries[2] = midboundaries[2] - 2*M_PI;
+  }
+  else if(boundaries[2] < 0){
+	  midboundaries[2] = midboundaries[2] + 2*M_PI;
+  }
+  midboundaries[3] = midboundaries[2] + 0.5*M_PI;
+  if(midboundaries[3] > 2*M_PI){
+	  midboundaries[3] = midboundaries[3] - 2*M_PI;
+  }
+  else if(boundaries[3] < 0){
+	  midboundaries[3] = midboundaries[3] + 2*M_PI;
+  }
+  
+  //printf("drone%d: row zone boundaries %f %f %f %f own dir %f intr dir %f\n",ownship.id,boundaries[0],boundaries[1],boundaries[2],boundaries[3],odir,idir);
+  
+  if(boundaries[1] > boundaries[0]){
+	  if(boundaries[2] > boundaries[1]){
+		  if(boundaries[3] > boundaries[2]){
+			  midboundaries[3] = 0;
+		  }
+		  else{ ///
+			  midboundaries[2] = 0;
+		  }
+	  }
+	  else{
+		  midboundaries[1] = 0;
+	  }
   }
   else{
-	  if(idir > boundaries[0] && idir < boundaries[1]){
-	printf("sit1\n");
-	    *rowzone = 1;
+	  midboundaries[0] = 0;
+  }
+  
+  if(midboundaries[0] == 0){
+	  if(idir > boundaries[0]){
+		  *rowzone = 1;
 	  }
+	  else if(idir > 0 && idir < boundaries[1]){
+		  *rowzone = 1;
+	  }	
 	  else if(idir > boundaries[1] && idir < boundaries[2]){
-	printf("sit2\n");
-	    *rowzone = 2;
+		  *rowzone = 2;
 	  }
 	  else if(idir > boundaries[2] && idir < boundaries[3]){
-	printf("sit3\n");
-	    *rowzone = 3;
+		  *rowzone = 3;
 	  }
 	  else if(idir > boundaries[3] && idir < boundaries[0]){
-	printf("sit4\n");
-	    *rowzone = 4;
+		  *rowzone = 4;
 	  }
-	  else if(idir == boundaries[0]){
-	printf("sit5\n");
-	    *rowzone = 1;
+	  else if(idir == boundaries [0]){
+		  *rowzone = 1;
 	  }
-	  else if(idir == boundaries[1]){
-	printf("sit6\n");
-	    *rowzone = 2;
+	  else if(idir == boundaries [1]){
+		  *rowzone = 2;
 	  }
-	  else if(idir == boundaries[2]){
-	printf("sit7\n");
-	    *rowzone = 3;
+	  else if(idir == boundaries [2]){
+		  *rowzone = 3;
 	  }
-	  else if(idir == boundaries[3]){
-	printf("sit8\n");
-	    *rowzone = 4;
+	  else if(idir == boundaries [3]){
+		  *rowzone = 4;
 	  }
   }
+  else if(midboundaries[1] == 0){
+	  if(idir > boundaries[1]){
+		  *rowzone = 2;
+	  }
+	  else if(idir > 0 && idir < boundaries[2]){
+		  *rowzone = 2;
+	  }
+	  else if(idir > boundaries[0] && idir < boundaries[1]){
+		  *rowzone = 1;
+	  }
+	  else if(idir > boundaries[2] && idir < boundaries[3]){
+		  *rowzone = 3;
+	  }
+	  else if(idir > boundaries[3] && idir < boundaries[0]){
+		  *rowzone = 4;
+	  }
+	  else if(idir == boundaries [0]){
+		  *rowzone = 1;
+	  }
+	  else if(idir == boundaries [1]){
+		  *rowzone = 2;
+	  }
+	  else if(idir == boundaries [2]){
+		  *rowzone = 3;
+	  }
+	  else if(idir == boundaries [3]){
+		  *rowzone = 4;
+	  }
+  }
+  else if(midboundaries[2] == 0){
+	  if(idir > boundaries[2]){
+		  *rowzone = 3;
+	  }
+	  else if(idir > 0 && idir < boundaries[3]){
+		  *rowzone = 3;
+	  }
+	  else if(idir > boundaries[0] && idir < boundaries[1]){
+		  *rowzone = 1;
+	  }
+	  else if(idir > boundaries[1] && idir < boundaries[2]){
+		  *rowzone = 2;
+	  }
+	  else if(idir > boundaries[3] && idir < boundaries[0]){
+		  *rowzone = 4;
+	  }
+	  else if(idir == boundaries [0]){
+		  *rowzone = 1;
+	  }
+	  else if(idir == boundaries [1]){
+		  *rowzone = 2;
+	  }
+	  else if(idir == boundaries [2]){
+		  *rowzone = 3;
+	  }
+	  else if(idir == boundaries [3]){
+		  *rowzone = 4;
+	  }
+  }
+  else if(midboundaries[3] == 0){
+	  if(idir > boundaries[3]){
+		  *rowzone = 4;
+	  }
+	  else if(idir > 0 && idir < boundaries[0]){
+		  *rowzone = 4;
+	  }
+	  else if(idir > boundaries[0] && idir < boundaries[1]){
+		  *rowzone = 1;
+	  }
+	  else if(idir > boundaries[1] && idir < boundaries[2]){
+		  *rowzone = 2;
+	  }
+	  else if(idir > boundaries[2] && idir < boundaries[3]){
+		  *rowzone = 3;
+	  }
+	  else if(idir == boundaries [0]){
+		  *rowzone = 1;
+	  }
+	  else if(idir == boundaries [1]){
+		  *rowzone = 2;
+	  }
+	  else if(idir == boundaries [2]){
+		  *rowzone = 3;
+	  }
+	  else if(idir == boundaries [3]){
+		  *rowzone = 4;
+	  }
+  }
+  
 }
 

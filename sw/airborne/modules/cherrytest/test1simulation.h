@@ -77,6 +77,7 @@ int function_init();
 void getOwnship();
 void getIntruder();
 void getRelative();
+void printStuff();
 
 extern int avoid_detection1(void);
 extern void cherry_init(void);
@@ -84,6 +85,7 @@ void calcGlobalAzimuth(float ownshipx, float ownshipy, float intruderx, float in
 float calcAzimuthAngle1(float ownshipx, float ownshipy, float intruderx, float intrudery,float angleownship);
 void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float* y_inc);
 void calcROWzone(float odir, float idir, int* rowzone);
+
 extern int avoid_navigation1(uint8_t wpb);
 extern int safe_setting1(void);
 
