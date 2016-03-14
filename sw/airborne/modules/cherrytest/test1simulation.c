@@ -165,7 +165,7 @@ int avoid_detection1(){
   int row_zone = 0;
   if (userow == 1){
 	  calcROWzone(ownship.direction, intruder.direction, &row_zone);
-	  printf("drone%d: zone %d\n",ownship.id,row_zone);
+	  printf("drone%d: row zone %d\n",ownship.id,row_zone);
   }
 
   if (relative.distance > init.rpz){
