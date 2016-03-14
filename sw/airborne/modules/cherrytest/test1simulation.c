@@ -165,7 +165,6 @@ int avoid_detection1(){
   int row_zone = 0;
   if (userow == 1){
 	  calcROWzone(ownship.direction, intruder.direction, &row_zone);
-	  printf("userow done %d %f %f\n",row_zone, intruder.speed_y, ownship.speed_y);
   }
 
   if (relative.distance > init.rpz){
@@ -452,135 +451,64 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
 }
 
 void calcROWzone(float odir, float idir, int* rowzone){
-	float ownshipdir;
-	float intruderdir;
-	float row_angle;
-	  if (odir > 0){
-		  ownshipdir = odir;
-	  }
-	  else {
-		  ownshipdir = odir + 2*M_PI;
-	  }
+  float boundaries[4];
+  boundaries[0] = odir - 0.25*pi;
+  if(boundaries[0] > 2*M_PI){
+    boundaries[0] = boundaries[0] - 2*M_PI;
+  }
+  else if(boundaries[0] < 0){
+    boundaries[0] = boundaries[0] + 2*M_PI;
+  }
 
-	  if(idir > 0){
-		  intruderdir = idir;
-	  }
-	  else {
-		  intruderdir = idir + 2*M_PI;
-	  }
+  boundaries[1] = boundaries[0] + 0.5*pi;
+  if(boundaries[1] > 2*M_PI){
+    boundaries[1] = boundaries[1] - 2*M_PI;
+  }
+  else if(boundaries[1] < 0){
+    boundaries[1] = boundaries[1] + 2*M_PI;
+  }
 
-	  row_angle = intruderdir - ownshipdir;
+  boundaries[2] = boundaries[1] + 0.5*pi;
+  if(boundaries[2] > 2*M_PI){
+    boundaries[2] = boundaries[2] - 2*M_PI;
+  }
+  else if(boundaries[2 < 0){
+    boundaries[2] = boundaries[2] + 2*M_PI;
+  }
 
-	  if (ownshipdir >= 1.75*M_PI && ownshipdir < 0.25 * M_PI){
-		  printf("first case");
-		  if (row_angle < 0){
-			  row_angle = row_angle * -1;
-		  }
-		  if(row_angle >= 1.75*M_PI && row_angle < 0.25 * M_PI){
-			  *rowzone = 1;
-		  }
-		  else if(row_angle >= 0.25*M_PI && row_angle < 0.75*M_PI){
-			  *rowzone = 2;
-		  }
-		  else if(row_angle >= 0.75*M_PI && row_angle < 1.25*M_PI){
-			  *rowzone = 3;
-		  }
-		  else if(row_angle >= 1.25*M_PI & row_angle < 1.75*M_PI){
-			  *rowzone = 3;
-		  }
-	  }
+  boundaries[3] = boundaries[2] + 0.5*pi;
+  if(boundaries[3] > 2*M_PI){
+    boundaries[3] = boundaries[3] - 2*M_PI;
+  }
+  else if(boundaries[3] < 0){
+    boundaries[3] = boundaries[3] + 2*M_PI;
+  }
 
-	  if (ownshipdir >= 0.25*M_PI && ownshipdir < 0.75*M_PI){
-		  printf("second case");
-		  if (row_angle < 0){
-			  row_angle = row_angle * -1;
-		  }
-		  if(row_angle >= 1.75*M_PI && row_angle < 0.25 * M_PI){
-			  *rowzone = 1;
-		  }
-		  else if(row_angle >= 0.25*M_PI && row_angle < 0.75*M_PI){
-			  if(intruder.speed_y < ownship.speed_y){
-				  *rowzone = 2;
-			  }
-			  else{
-				  *rowzone = 4;
-			  }
 
-		  }
-		  else if(row_angle >= 0.75*M_PI && row_angle < 1.25*M_PI){
-			  *rowzone = 3;
-		  }
-		  else if(row_angle >= 1.25*M_PI & row_angle < 1.75*M_PI){
-			  if(intruder.speed_y < ownship.speed_y){
-				  *rowzone = 2;
-			  }
-			  else{
-				  *rowzone = 4;
-			  }
-		  }
-	  }
-
-	  if (ownshipdir >= 0.75*M_PI && ownshipdir < 1.25*M_PI){
-		  printf("third case");
-		  if (row_angle < 0){
-			  row_angle = row_angle * -1;
-		  }
-		  if(row_angle >= 1.75*M_PI && row_angle < 0.25 * M_PI){
-			  *rowzone = 1;
-		  }
-		  else if(row_angle >= 0.25*M_PI && row_angle < 0.75*M_PI){
-			  if(intruder.speed_x < ownship.speed_x){
-				  *rowzone = 2;
-			  }
-			  else{
-				  *rowzone = 4;
-			  }
-
-		  }
-		  else if(row_angle >= 0.75*M_PI && row_angle < 1.25*M_PI){
-			  *rowzone = 3;
-		  }
-		  else if(row_angle >= 1.25*M_PI & row_angle < 1.75*M_PI){
-			  if(intruder.speed_x < ownship.speed_x){
-				  *rowzone = 2;
-			  }
-			  else{
-				  *rowzone = 4;
-			  }
-		  }
-	  }
-
-	  if (ownshipdir >= 1.25*M_PI && ownshipdir < 1.75*M_PI){
-		  printf("last case\n");
-	  		  if (row_angle < 0){
-	  			  row_angle = row_angle * -1;
-	  		  }
-	  		  if(row_angle >= 1.75*M_PI && row_angle < 0.25 * M_PI){
-	  			  *rowzone = 1;
-	  		  }
-	  		  else if(row_angle >= 0.25*M_PI && row_angle < 0.75*M_PI){
-	  			  printf("last case1\n");
-	  			  if(intruder.speed_y > ownship.speed_y){
-	  				  *rowzone = 2;
-	  			  }
-	  			  else if(intruder.speed_y < ownship.speed_y){
-	  				  printf("how %f %f\n", intruder.speed_y, ownship.speed_y);
-	  				  *rowzone = 4;
-	  			  }
-	  		  }
-	  		  else if(row_angle >= 0.75*M_PI && row_angle < 1.25*M_PI){
-	  			  *rowzone = 3;
-	  		  }
-	  		  else if(row_angle >= 1.25*M_PI & row_angle < 1.75*M_PI){
-	  			printf("last case2\n");
-	  			  if(intruder.speed_y > ownship.speed_y){
-	  				  *rowzone = 2;
-	  			  }
-	  			  else if(intruder.speed_y < ownship.speed_y){
-	  				printf("how %f %f\n", intruder.speed_y, ownship.speed_y);
-	  				  *rowzone = 4;
-	  			  }
-	  		  }
-	  	  }
+  if(idir > boundaries[0] && idir < boundaries[1]){
+    *rowzone = 1;
+  }
+  else if(idir > boundaries[1] && idir < boundaries[2]){
+    *rowzone = 2;
+  }
+  else if(idir > boundaries[2] && idir < boundaries[3]){
+    *rowzone = 3;
+  }
+  else if(idir > boundaries[4] && idir < boundaries[0]){
+    *rowzone = 4;
+  }
+  else if(idir == boundaries[0]){
+    *rowzone = 1;
+  }
+  else if(idir == boundaries[1]){
+    *rowzone = 2;
+  }
+  else if(idir == boundaries[2]){
+    *rowzone = 3;
+  }
+  else if(idir == boundaries[3]){
+    *rowzone = 4;
+  }
+}
 
 }
