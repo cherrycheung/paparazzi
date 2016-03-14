@@ -165,6 +165,7 @@ int avoid_detection1(){
   int row_zone = 0;
   if (userow == 1){
 	  calcROWzone(ownship.direction, intruder.direction, &row_zone);
+	  printf("drone%d: zone %d\n",ownship.id,row_zone);
   }
 
   if (relative.distance > init.rpz){
@@ -452,7 +453,7 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
 
 void calcROWzone(float odir, float idir, int* rowzone){
   float boundaries[4];
-  boundaries[0] = odir - 0.25*pi;
+  boundaries[0] = odir - 0.25*M_PI;
   if(boundaries[0] > 2*M_PI){
     boundaries[0] = boundaries[0] - 2*M_PI;
   }
@@ -460,7 +461,7 @@ void calcROWzone(float odir, float idir, int* rowzone){
     boundaries[0] = boundaries[0] + 2*M_PI;
   }
 
-  boundaries[1] = boundaries[0] + 0.5*pi;
+  boundaries[1] = boundaries[0] + 0.5*M_PI;
   if(boundaries[1] > 2*M_PI){
     boundaries[1] = boundaries[1] - 2*M_PI;
   }
@@ -468,15 +469,15 @@ void calcROWzone(float odir, float idir, int* rowzone){
     boundaries[1] = boundaries[1] + 2*M_PI;
   }
 
-  boundaries[2] = boundaries[1] + 0.5*pi;
+  boundaries[2] = boundaries[1] + 0.5*M_PI;
   if(boundaries[2] > 2*M_PI){
     boundaries[2] = boundaries[2] - 2*M_PI;
   }
-  else if(boundaries[2 < 0){
+  else if(boundaries[2] < 0){
     boundaries[2] = boundaries[2] + 2*M_PI;
   }
 
-  boundaries[3] = boundaries[2] + 0.5*pi;
+  boundaries[3] = boundaries[2] + 0.5*M_PI;
   if(boundaries[3] > 2*M_PI){
     boundaries[3] = boundaries[3] - 2*M_PI;
   }
@@ -509,6 +510,4 @@ void calcROWzone(float odir, float idir, int* rowzone){
   else if(idir == boundaries[3]){
     *rowzone = 4;
   }
-}
-
 }
