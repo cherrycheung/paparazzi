@@ -484,30 +484,54 @@ void calcROWzone(float odir, float idir, int* rowzone){
   else if(boundaries[3] < 0){
     boundaries[3] = boundaries[3] + 2*M_PI;
   }
- //newnew
-
-  if(idir > boundaries[0] && idir < boundaries[1]){
-    *rowzone = 1;
+float xx = odir - 0.75*M_PI+2*M_PI;
+  if(idir < 0.5*M_PI){
+    if(boundaries[0] == xx){
+	*rowzone = 1;
+    }
+    if(boundaries[1] == xx){
+	*rowzone = 2;
+    }
+    if(boundaries[2] == xx){
+	*rowzone = 3;
+    }
+    if(boundaries[3] == xx){
+	*rowzone = 4;
+    }
   }
-  else if(idir > boundaries[1] && idir < boundaries[2]){
-    *rowzone = 2;
-  }
-  else if(idir > boundaries[2] && idir < boundaries[3]){
-    *rowzone = 3;
-  }
-  else if(idir > boundaries[4] && idir < boundaries[0]){
-    *rowzone = 4;
-  }
-  else if(idir == boundaries[0]){
-    *rowzone = 1;
-  }
-  else if(idir == boundaries[1]){
-    *rowzone = 2;
-  }
-  else if(idir == boundaries[2]){
-    *rowzone = 3;
-  }
-  else if(idir == boundaries[3]){
-    *rowzone = 4;
+  else{
+	  if(idir > boundaries[0] && idir < boundaries[1]){
+	printf("sit1\n");
+	    *rowzone = 1;
+	  }
+	  else if(idir > boundaries[1] && idir < boundaries[2]){
+	printf("sit2\n");
+	    *rowzone = 2;
+	  }
+	  else if(idir > boundaries[2] && idir < boundaries[3]){
+	printf("sit3\n");
+	    *rowzone = 3;
+	  }
+	  else if(idir > boundaries[3] && idir < boundaries[0]){
+	printf("sit4\n");
+	    *rowzone = 4;
+	  }
+	  else if(idir == boundaries[0]){
+	printf("sit5\n");
+	    *rowzone = 1;
+	  }
+	  else if(idir == boundaries[1]){
+	printf("sit6\n");
+	    *rowzone = 2;
+	  }
+	  else if(idir == boundaries[2]){
+	printf("sit7\n");
+	    *rowzone = 3;
+	  }
+	  else if(idir == boundaries[3]){
+	printf("sit8\n");
+	    *rowzone = 4;
+	  }
   }
 }
+
