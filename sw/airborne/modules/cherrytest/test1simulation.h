@@ -69,15 +69,15 @@ struct data2 {
   float avoidance;
 };
 
-extern struct data2 init;
+extern struct data2 init2;
 
 #endif
 
-int function_init();
-void getOwnship();
-void getIntruder();
-void getRelative();
-void printStuff();
+int function_init(void);
+void getOwnship(void);
+void getIntruder(int carrot);
+void getRelative(void);
+void printStuff(void);
 
 extern int avoid_detection1(void);
 extern void cherry_init(void);
@@ -92,11 +92,6 @@ extern int safe_setting1(void);
 
 extern int valueofdetection1;
 extern int valueofnavigation1;
-extern float hellobaby;
 extern float new_waypoint_x;
 extern float new_waypoint_y;
-extern float angle_azimuth;
-extern float own_direction_deg;
-extern float testvalue;
 extern int simulation;
-extern int ac_id2;
