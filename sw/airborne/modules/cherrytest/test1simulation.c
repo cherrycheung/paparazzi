@@ -335,7 +335,7 @@ void calcGlobalAzimuth(float ownshipx, float ownshipy, float intruderx, float in
 
 void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float* y_inc){
   *d_avo1 = rpz/sin(lala);
-  float avoidfactor = 1.2;
+  float avoidfactor = 1.0;
   float d_avo2 = *d_avo1 * tan(lala);
   float d_avot = sqrt((*d_avo1)*(*d_avo1) + d_avo2*d_avo2);
   int avoidsituation =0;
