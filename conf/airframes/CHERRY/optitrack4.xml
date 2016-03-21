@@ -5,7 +5,7 @@
   <firmware name="rotorcraft">
 
     <!-- HOST is the Name or IP of your AC -->
-    <configure name="HOST" value="192.168.0.201"/>
+    <configure name="HOST" value="192.168.0.202"/>
     <!-- MODEM_HOST is where the data should go to, for short normally your laptop IP address -->
     <configure name="MODEM_HOST" value="192.168.0.44"/>
 

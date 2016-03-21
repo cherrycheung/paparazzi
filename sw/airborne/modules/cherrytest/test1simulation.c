@@ -132,6 +132,9 @@ int avoid_detection1(){
   init2.rpz = 1.0;
   init2.factor = 1.0;
   init2.avoidance = 35.0/180.0 * M_PI;
+  float add_avoidancedistance = 0.4;
+  float add_avoidancewp = 1.1;
+		  
 
   // Avoidance module
   float d_vo = (relative.distance*relative.distance - init2.rpz*init2.rpz)/relative.distance;
@@ -161,7 +164,23 @@ int avoid_detection1(){
 
 
   calcAvoidanceDist(init2.avoidance, init2.rpz, ownship.direction, &d_avo, &new_waypoint_x, &new_waypoint_y);
-
+  /*if (new_waypoint_x  < 0){
+	  new_waypoint_x = new_waypoint_x - add_avoidancewp;
+  }
+  else if(new_waypoint_x > 0){
+	  new_waypoint_x = new_waypoint_x + add_avoidancewp;
+  }
+  
+  if (new_waypoint_y  < 0){
+	  new_waypoint_y = new_waypoint_y - add_avoidancewp;
+  }
+  else if(new_waypoint_y > 0){
+	  new_waypoint_y = new_waypoint_y + add_avoidancewp;
+  }*/
+  
+  new_waypoint_x = new_waypoint_x*add_avoidancewp;
+  new_waypoint_y = new_waypoint_y*add_avoidancewp;
+  
   // Right of way
   int row_zone = 0;
   if (userow == 1){
@@ -172,7 +191,7 @@ int avoid_detection1(){
   if (relative.distance > init2.rpz){
     if(abs(gamma) < alpha_vo){
       printf("drone%d: inside VO but not close enough\n", ownship.id);
-      if (relative.distance < d_avo * 1){
+      if (relative.distance < (d_avo + add_avoidancedistance)){
         printf("drone%d: smaller than d_avo and inside VO\n", ownship.id);
         if(userow == 0){
           valueofdetection1 = 1;
@@ -335,7 +354,6 @@ void calcGlobalAzimuth(float ownshipx, float ownshipy, float intruderx, float in
 
 void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float* y_inc){
   *d_avo1 = rpz/sin(lala);
-  float avoidfactor = 1.0;
   float d_avo2 = *d_avo1 * tan(lala);
   float d_avot = sqrt((*d_avo1)*(*d_avo1) + d_avo2*d_avo2);
   int avoidsituation =0;
@@ -365,44 +383,44 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
     if(avoidsituation == 1){
       *x_inc = sin(beta)*d_avot;
       *y_inc = cos(beta)*d_avot;
-      *x_inc = *x_inc*avoidfactor;
-      *y_inc = *y_inc*avoidfactor;
+      *x_inc = *x_inc;
+      *y_inc = *y_inc;
     }
     else if(avoidsituation == 2){
       *x_inc = cos(beta)*d_avot;
       *y_inc = sin(beta)*d_avot;
-      *x_inc = *x_inc*avoidfactor;
-      *y_inc = -1*(*y_inc)*avoidfactor;
+      *x_inc = *x_inc;
+      *y_inc = -1*(*y_inc);
     }
     else if(avoidsituation == 3){
       *x_inc = sin(beta)*d_avot;
       *y_inc = cos(beta)*d_avot;
-      *x_inc = -1*(*x_inc)*avoidfactor;
-      *y_inc = -1*(*y_inc)*avoidfactor;
+      *x_inc = -1*(*x_inc);
+      *y_inc = -1*(*y_inc);
     }
     else if(avoidsituation == 4){
       *x_inc = cos(beta)*d_avot;
       *y_inc = sin(beta)*d_avot;
-      *x_inc = -1*(*x_inc)*avoidfactor;
-      *y_inc = *y_inc*avoidfactor;
+      *x_inc = -1*(*x_inc);
+      *y_inc = *y_inc;
     }
   }
   else if(beta == 0.5*M_PI){
     if(avoidsituation == 1){
-      *x_inc = -2*rpz*avoidfactor;
+      *x_inc = -2*rpz;
       *y_inc = 0;
     }
     else if(avoidsituation == 2){
       *x_inc = 0;
-      *y_inc = -2*rpz*avoidfactor;
+      *y_inc = -2*rpz;
     }
     else if(avoidsituation == 3){
-      *x_inc = 2*rpz*avoidfactor;
+      *x_inc = 2*rpz;
       *y_inc = 0;
     }
     else if(avoidsituation == 4){
       *x_inc = 0;
-      *y_inc = 2*rpz*avoidfactor;
+      *y_inc = 2*rpz;
     }
   }
   else if(beta > 0.5*M_PI){
@@ -410,26 +428,26 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
     if(avoidsituation == 1){
       *x_inc = sin(gamma2)*d_avot;
       *y_inc = cos(gamma2)*d_avot;
-      *x_inc = (*x_inc)*avoidfactor;
-      *y_inc = -1*(*y_inc)*avoidfactor;
+      *x_inc = (*x_inc);
+      *y_inc = -1*(*y_inc);
     }
     else if(avoidsituation == 2){
       *x_inc = cos(gamma2)*d_avot;
       *y_inc = sin(gamma2)*d_avot;
-      *x_inc = -1*(*x_inc)*avoidfactor;
-      *y_inc = -1*(*y_inc)*avoidfactor;
+      *x_inc = -1*(*x_inc);
+      *y_inc = -1*(*y_inc);
     }
     else if(avoidsituation == 3){
       *x_inc = sin(gamma2)*d_avot;
       *y_inc = cos(gamma2)*d_avot;
-      *x_inc = -1*(*x_inc)*avoidfactor;
-      *y_inc = (*y_inc)*avoidfactor;
+      *x_inc = -1*(*x_inc);
+      *y_inc = (*y_inc);
     }
     else if(avoidsituation == 4){
       *x_inc = cos(gamma2)*d_avot;
       *y_inc = sin(gamma2)*d_avot;
-      *x_inc = (*x_inc)*avoidfactor;
-      *y_inc = (*y_inc)*avoidfactor;
+      *x_inc = (*x_inc);
+      *y_inc = (*y_inc);
     }
   }
 }
