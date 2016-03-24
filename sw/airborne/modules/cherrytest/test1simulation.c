@@ -162,21 +162,7 @@ int avoid_detection1(){
     gamma = (delta - (-1)*relative.global_o);
   }
 
-
   calcAvoidanceDist(init2.avoidance, init2.rpz, ownship.direction, &d_avo, &new_waypoint_x, &new_waypoint_y);
-  /*if (new_waypoint_x  < 0){
-	  new_waypoint_x = new_waypoint_x - add_avoidancewp;
-  }
-  else if(new_waypoint_x > 0){
-	  new_waypoint_x = new_waypoint_x + add_avoidancewp;
-  }
-  
-  if (new_waypoint_y  < 0){
-	  new_waypoint_y = new_waypoint_y - add_avoidancewp;
-  }
-  else if(new_waypoint_y > 0){
-	  new_waypoint_y = new_waypoint_y + add_avoidancewp;
-  }*/
   
   new_waypoint_x = new_waypoint_x*add_avoidancewp;
   new_waypoint_y = new_waypoint_y*add_avoidancewp;
@@ -354,6 +340,7 @@ void calcGlobalAzimuth(float ownshipx, float ownshipy, float intruderx, float in
 
 void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float* y_inc){
   *d_avo1 = rpz/sin(lala);
+  float addavoid = 0.0;
   float d_avo2 = *d_avo1 * tan(lala);
   float d_avot = sqrt((*d_avo1)*(*d_avo1) + d_avo2*d_avo2);
   int avoidsituation =0;
@@ -383,44 +370,44 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
     if(avoidsituation == 1){
       *x_inc = sin(beta)*d_avot;
       *y_inc = cos(beta)*d_avot;
-      *x_inc = *x_inc;
-      *y_inc = *y_inc;
+      *x_inc = *x_inc+addavoid;
+      *y_inc = *y_inc+addavoid;
     }
     else if(avoidsituation == 2){
       *x_inc = cos(beta)*d_avot;
       *y_inc = sin(beta)*d_avot;
-      *x_inc = *x_inc;
-      *y_inc = -1*(*y_inc);
+      *x_inc = *x_inc+addavoid;
+      *y_inc = -1*(*y_inc+addavoid);
     }
     else if(avoidsituation == 3){
       *x_inc = sin(beta)*d_avot;
       *y_inc = cos(beta)*d_avot;
-      *x_inc = -1*(*x_inc);
-      *y_inc = -1*(*y_inc);
+      *x_inc = -1*(*x_inc+addavoid);
+      *y_inc = -1*(*y_inc+addavoid);
     }
     else if(avoidsituation == 4){
       *x_inc = cos(beta)*d_avot;
       *y_inc = sin(beta)*d_avot;
-      *x_inc = -1*(*x_inc);
-      *y_inc = *y_inc;
+      *x_inc = -1*(*x_inc+addavoid);
+      *y_inc = *y_inc+addavoid;
     }
   }
   else if(beta == 0.5*M_PI){
     if(avoidsituation == 1){
-      *x_inc = -2*rpz;
+      *x_inc = 2*rpz-addavoid;
       *y_inc = 0;
     }
     else if(avoidsituation == 2){
       *x_inc = 0;
-      *y_inc = -2*rpz;
+      *y_inc = -2*rpz-addavoid;
     }
     else if(avoidsituation == 3){
-      *x_inc = 2*rpz;
+      *x_inc = -2*rpz-addavoid;
       *y_inc = 0;
     }
     else if(avoidsituation == 4){
       *x_inc = 0;
-      *y_inc = 2*rpz;
+      *y_inc = 2*rpz+addavoid;
     }
   }
   else if(beta > 0.5*M_PI){
@@ -428,26 +415,26 @@ void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_a
     if(avoidsituation == 1){
       *x_inc = sin(gamma2)*d_avot;
       *y_inc = cos(gamma2)*d_avot;
-      *x_inc = (*x_inc);
-      *y_inc = -1*(*y_inc);
+      *x_inc = (*x_inc)+addavoid;
+      *y_inc = -1*(*y_inc+addavoid);
     }
     else if(avoidsituation == 2){
       *x_inc = cos(gamma2)*d_avot;
       *y_inc = sin(gamma2)*d_avot;
-      *x_inc = -1*(*x_inc);
-      *y_inc = -1*(*y_inc);
+      *x_inc = -1*(*x_inc+addavoid);
+      *y_inc = -1*(*y_inc+addavoid);
     }
     else if(avoidsituation == 3){
       *x_inc = sin(gamma2)*d_avot;
       *y_inc = cos(gamma2)*d_avot;
-      *x_inc = -1*(*x_inc);
-      *y_inc = (*y_inc);
+      *x_inc = -1*(*x_inc+addavoid);
+      *y_inc = (*y_inc+addavoid);
     }
     else if(avoidsituation == 4){
       *x_inc = cos(gamma2)*d_avot;
       *y_inc = sin(gamma2)*d_avot;
-      *x_inc = (*x_inc);
-      *y_inc = (*y_inc);
+      *x_inc = (*x_inc+addavoid);
+      *y_inc = (*y_inc+addavoid);
     }
   }
 }
