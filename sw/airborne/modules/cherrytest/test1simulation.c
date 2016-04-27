@@ -135,54 +135,71 @@ int avoid_detection1(){
   float add_avoidancedistance = 0.3;
 
   // Avoidance module
-  float d_vo = (relative.distance*relative.distance - init2.rpz*init2.rpz)/relative.distance;
+  /*float d_vo = (relative.distance*relative.distance - init2.rpz*init2.rpz)/relative.distance;
   float r_vo = init2.rpz*((sqrt(relative.distance*relative.distance - init2.rpz*init2.rpz))/relative.distance);
-  float alpha_vo = atan(r_vo/d_vo);
+  float alpha_vo = atan(r_vo/d_vo);*/
+  float alpha_vo2 = asin(init2.rpz/relative.distance);
+  if (relative.distance < init2.rpz){
+	  alpha_vo2 = 0.25*M_PI;
+  }
 
   float Rx = ownship.speed_x - intruder.speed_x;
   float Ry = ownship.speed_y - intruder.speed_y;
   float delta;
   float gamma = 0;
-  int teller;
-  if (Rx >= 0 && Ry >= 0){
-    delta = atan(Rx/Ry);
-    gamma = (delta - relative.global_o);
-  }
-  else if(Rx > 0 && Ry < 0){
-	  teller = 1;
-    delta = 0.5*M_PI + atan(Rx/((-1)*Ry));
-    gamma = (delta - relative.global_o);
-  }
-  else if(Rx < 0 && Ry < 0){
-	  teller = 1;
-    delta = 0.5*M_PI + atan(Rx/Ry);
-    gamma = (delta - (-1)*relative.global_o);
-  }
-  else if(Rx < 0 && Ry > 0){
-	  teller = 1;
-    delta = atan((-1*Rx)/Ry);
-    gamma = (delta - (-1)*relative.global_o);
-  }
+  int teller = 0;
+  float boundary_1;
+  float boundary_2;
   
-  if (Rx >= 0 && Ry >= 0 && relative.global_o > 0 && relative.global_o <= 0.5*M_PI ){
-	  teller = 1;
+  printf("drone%d: speed %f %f %f %f %f %f",ownship.id,ownship.speed_x,ownship.speed_y,intruder.speed_x,intruder.speed_y,Rx,Ry);
+  if (relative.global_o > 0 && relative.global_o < 0.5*M_PI){
+	  boundary_1 = -0.1*M_PI;
+	  boundary_2 = 0.6*M_PI;
+	  if(Rx > 0 && Ry > 0 && ownship.direction > boundary_1 && ownship.direction < boundary_2){
+		  printf(" case 1\n");
+		  teller = 1;
+		  delta = atan(Rx/Ry);
+		  gamma = delta - 0.5*M_PI + relative.global_o;
+	  }
   }
-  else if(Rx > 0 && Ry < 0 && relative.global_o >= 0.5*M_PI && relative.global_o <= M_PI ){
-	  teller = 1;
+  else if(relative.global_o > 0.5*M_PI && relative.global_o < M_PI){
+	  boundary_1 = 0.6*M_PI;
+	  boundary_2 = M_PI;	  
+	  if(Rx > 0 && Ry < 0 && ownship.direction > boundary_1 && ownship.direction < boundary_2){
+		  printf(" case 2\n");
+		  teller = 1;
+		  delta = 0.5*M_PI + atan(Rx/((-1)*Ry));
+		  gamma = relative.global_o - delta;
+	  }
   }
-  else if(Rx < 0 && Ry < 0 && relative.global_o <= -0.5*M_PI && relative.global_o >= -1*M_PI ){
-	  teller = 1;
+  else if(relative.global_o > -1*M_PI && relative.global_o < -0.5*M_PI){
+	  boundary_1 = -1*M_PI;
+	  boundary_2 = -0.4*M_PI;	  
+	  if(Rx < 0 && Ry < 0 && ownship.direction > boundary_1 && ownship.direction < boundary_2){
+		  printf(" case 3\n");
+		  teller = 1;
+		  delta = -1*(0.5*M_PI + atan(Rx/Ry));
+		  gamma = -1*relative.global_o - (-1)*delta;
+	  }
   }
-  else if(Rx < 0 && Ry > 0 && relative.global_o <= 0 && relative.global_o >= -0.5*M_PI ){
-	  teller = 1;
-  }
-  
-  printf("drone%d:%f %f %f %f %f \n",ownship.id,gamma,abs(gamma),delta,relative.global_o,alpha_vo);
+  else if(relative.global_o > -0.5*M_PI && relative.global_o < 0){
+	  boundary_1 = -0.6*M_PI;
+	  boundary_2 = 0.1*M_PI;
+	  if(Rx < 0 && Ry > 0 && ownship.direction > boundary_1 && ownship.direction < boundary_2){
+		  printf(" case 4\n");
+		  teller = 1;
+		  delta = atan((-1*Rx)/Ry);
+		  gamma = delta - 0.5*M_PI + (-1)*relative.global_o;
+	  }
+  }  
+ 
+
+  printf("drone%d:%f %f %f %f %d\n",ownship.id,delta,relative.global_o,gamma,alpha_vo2,teller);
   if(gamma < 0){
 	  gamma = gamma*-1;
   }
 
-  calcAvoidanceDist(init2.avoidance, init2.rpz, ownship.direction, &d_avo, &new_waypoint_x, &new_waypoint_y);
+  calcAvoidanceDist(init2.avoidance, init2.rpz, relative.global_o, &d_avo, &new_waypoint_x, &new_waypoint_y);
   
   new_waypoint_x = new_waypoint_x;
   new_waypoint_y = new_waypoint_y;
@@ -191,11 +208,11 @@ int avoid_detection1(){
   int row_zone = 0;
   if (userow == 1){
 	  calcROWzone(ownship.direction, intruder.direction, &row_zone);
-	  printf("drone%d: row zone %d\n",ownship.id,row_zone);
+	  //printf("drone%d: row zone %d\n",ownship.id,row_zone);
   }
 
   if (relative.distance > init2.rpz){
-    if(gamma < alpha_vo && teller == 1){
+    if(gamma < alpha_vo2 && teller == 1){
       printf("drone%d: inside VO but not close enough\n", ownship.id);
       if (relative.distance < (d_avo + add_avoidancedistance)){
         printf("drone%d: smaller than d_avo and inside VO\n", ownship.id);
@@ -358,103 +375,103 @@ void calcGlobalAzimuth(float ownshipx, float ownshipy, float intruderx, float in
   }
 }
 
-void calcAvoidanceDist(float lala, float rpz, float ownshipangle_rad, float* d_avo1, float* x_inc, float* y_inc){
+void calcAvoidanceDist(float lala, float rpz, float globalangle_rad,float* d_avo1, float* x_inc, float* y_inc){
   *d_avo1 = rpz/sin(lala);
   float addavoid = 0.1;
   float d_avo2 = *d_avo1 * tan(lala);
   float d_avot = sqrt((*d_avo1)*(*d_avo1) + d_avo2*d_avo2);
-  int avoidsituation =0;
-  float ownshipangle2 = 0;
+  int avoidsituation = 0;
+  float gamma_angle = 0;
+  float beta;
 
-  if (ownshipangle_rad > 0 && ownshipangle_rad <= 0.5*M_PI){
+  if (globalangle_rad > 0 && globalangle_rad <= 0.5*M_PI){
     avoidsituation = 1;
-    ownshipangle2 = ownshipangle_rad;
+    printf("SITUATION1\n");
   }
-  else if(ownshipangle_rad > 0.5*M_PI && ownshipangle_rad <= M_PI){
+  else if(globalangle_rad > 0.5*M_PI && globalangle_rad <= M_PI){
     avoidsituation = 2;
-    ownshipangle2 = ownshipangle_rad - 0.5 * M_PI;
+    printf("SITUATION2\n");
   }
-  else if(ownshipangle_rad <= -0.5*M_PI && ownshipangle_rad > -1* M_PI){
+  else if(globalangle_rad <= -0.5*M_PI && globalangle_rad > -1* M_PI){
     avoidsituation = 3;
-    ownshipangle2 = ownshipangle_rad +  M_PI;
+    printf("SITUATION3\n");
   }
-  else if(ownshipangle_rad <= 0 && ownshipangle_rad > -0.5*M_PI){
+  else if(globalangle_rad <= 0 && globalangle_rad > -0.5*M_PI){
     avoidsituation = 4;
-    ownshipangle2 = ownshipangle_rad + 0.5 * M_PI;
+    printf("SITUATION4\n");
   }
 
-  float beta = ownshipangle2 + lala;
-
+  
   if (beta < 0.5*M_PI){
-
-    if(avoidsituation == 1){
-      *x_inc = sin(beta)*d_avot;
-      *y_inc = cos(beta)*d_avot;
-      *x_inc = *x_inc+addavoid;
-      *y_inc = *y_inc;//+addavoid;
-    }
-    else if(avoidsituation == 2){
-      *x_inc = cos(beta)*d_avot;
-      *y_inc = sin(beta)*d_avot;
-      *x_inc = *x_inc+addavoid;
-      *y_inc = -1*(*y_inc);
+	  if(avoidsituation == 1){
+		  beta = globalangle_rad + lala;
+		  gamma_angle = 0.5*M_PI-beta;
+		  *x_inc = cos(gamma_angle)*d_avot+addavoid;
+		  *y_inc = sin(gamma_angle)*d_avot;
+	  }
+	  else if(avoidsituation == 2){
+		  beta = globalangle_rad + lala-0.5*M_PI;
+		  gamma_angle = 0.5*M_PI-beta;
+		  *x_inc = sin(gamma_angle)*d_avot+addavoid;
+		  *y_inc = -cos(gamma_angle)*d_avot;
     }
     else if(avoidsituation == 3){
-      *x_inc = sin(beta)*d_avot;
-      *y_inc = cos(beta)*d_avot;
-      *x_inc = -1*(*x_inc+addavoid);
-      *y_inc = -1*(*y_inc);
+    	beta = globalangle_rad + lala + M_PI;
+    	gamma_angle = 0.5*M_PI-beta;
+    	printf("SITUATION3a\n");
+		  *x_inc = -cos(gamma_angle)*d_avot-addavoid;
+		  *y_inc = -sin(gamma_angle)*d_avot;
     }
     else if(avoidsituation == 4){
-      *x_inc = cos(beta)*d_avot;
-      *y_inc = sin(beta)*d_avot;
-      *x_inc = -1*(*x_inc+addavoid);
-      *y_inc = *y_inc;
+    	beta = globalangle_rad + lala + 0.5*M_PI;
+    	gamma_angle = 0.5*M_PI-beta;
+		  *x_inc = -sin(gamma_angle)*d_avot-addavoid;
+		  *y_inc = cos(gamma_angle)*d_avot;
     }
   }
   else if(beta == 0.5*M_PI){
     if(avoidsituation == 1){
-      *x_inc = 2*rpz-addavoid;
+      *x_inc = d_avot+addavoid;
       *y_inc = 0;
     }
     else if(avoidsituation == 2){
       *x_inc = 0;
-      *y_inc = -2*rpz;
+      *y_inc = -d_avot-addavoid;
     }
     else if(avoidsituation == 3){
-      *x_inc = -2*rpz-addavoid;
+      *x_inc = -d_avot-addavoid;
       *y_inc = 0;
     }
     else if(avoidsituation == 4){
       *x_inc = 0;
-      *y_inc = 2*rpz;
+      *y_inc = d_avot+addavoid;
     }
   }
   else if(beta > 0.5*M_PI){
-    float gamma2 = M_PI - beta;
     if(avoidsituation == 1){
-      *x_inc = sin(gamma2)*d_avot;
-      *y_inc = cos(gamma2)*d_avot;
-      *x_inc = (*x_inc)+addavoid;
-      *y_inc = -1*(*y_inc);
+    	beta = globalangle_rad + lala;
+    	gamma_angle = M_PI-beta;
+    	*x_inc = sin(gamma_angle)*d_avot+addavoid;
+		*y_inc = -cos(gamma_angle)*d_avot;
     }
     else if(avoidsituation == 2){
-      *x_inc = cos(gamma2)*d_avot;
-      *y_inc = sin(gamma2)*d_avot;
-      *x_inc = -1*(*x_inc+addavoid);
-      *y_inc = -1*(*y_inc);
+    	beta = globalangle_rad + lala-0.5*M_PI;
+    	gamma_angle = M_PI-beta;
+    	*x_inc = -cos(gamma_angle)*d_avot+addavoid;
+		*y_inc = -sin(gamma_angle)*d_avot;
     }
     else if(avoidsituation == 3){
-      *x_inc = sin(gamma2)*d_avot;
-      *y_inc = cos(gamma2)*d_avot;
-      *x_inc = -1*(*x_inc+addavoid);
-      *y_inc = (*y_inc);
+    	beta = globalangle_rad + lala + M_PI;
+    	gamma_angle = M_PI-beta;
+    	printf("SITUATION3c\n");
+        *x_inc = -sin(gamma_angle)*d_avot-addavoid;
+        *y_inc = cos(gamma_angle)*d_avot;
     }
     else if(avoidsituation == 4){
-      *x_inc = cos(gamma2)*d_avot;
-      *y_inc = sin(gamma2)*d_avot;
-      *x_inc = (*x_inc+addavoid);
-      *y_inc = (*y_inc);
+    	beta = globalangle_rad + lala + 0.5*M_PI;
+    	gamma_angle = M_PI-beta;
+    	*x_inc = cos(gamma_angle)*d_avot-addavoid;
+		*y_inc = sin(gamma_angle)*d_avot;
     }
   }
 }
